@@ -1,0 +1,87 @@
+# ============================================================================
+# Holy Calculator - Math-Enhanced LLM Calculator
+# Requirements for Phases 0-13
+# ============================================================================
+
+# ============================================================================
+# Core Dependencies (Phase 1-7)
+# ============================================================================
+
+# Mathematical computation
+sympy>=1.14.0                  # Symbolic mathematics (Layer 1 cascade)
+numpy>=2.0.2                   # Numerical operations
+
+# API and networking
+requests>=2.32.5               # Wolfram Alpha API calls (Layer 2 cascade)
+pyyaml>=6.0.3                  # Test case configuration files
+python-dotenv>=1.0.0           # Environment variable management (.env files)
+
+# System monitoring
+psutil>=5.9.6                  # CPU, memory, temperature monitoring
+
+# Hugging Face ecosystem (for model downloads only)
+huggingface-hub>=0.19.3,<1.0   # Model downloading from HF Hub
+filelock>=3.19.1               # File locking (HF dependency)
+tqdm>=4.67.1                   # Progress bars (HF dependency)
+packaging>=25.0                # Version handling (HF dependency)
+
+# ============================================================================
+# Hardware Integration (Phase 8)
+# ============================================================================
+
+pyserial>=3.5                  # TI-84 and ESP32 serial communication
+
+# ============================================================================
+# Optional: Web Dashboard (if implementing pi-stats-app)
+# ============================================================================
+
+# Flask>=3.0.0                 # Web server for monitoring dashboard
+# flask-cors>=4.0.0            # CORS support for dashboard
+
+# ============================================================================
+# NOT NEEDED (llama.cpp handles inference, not Python)
+# ============================================================================
+
+# transformers                 # NOT NEEDED - we use llama.cpp via subprocess
+# torch                        # NOT NEEDED - we use llama.cpp via subprocess
+
+# ============================================================================
+# Platform Notes
+# ============================================================================
+
+# macOS Development:
+#   - All dependencies install cleanly on Apple Silicon
+#   - psutil requires Xcode Command Line Tools
+#   - No GPU support needed (CPU-only via llama.cpp)
+#
+# Raspberry Pi 5 Deployment:
+#   - All dependencies compatible with ARM64 (aarch64)
+#   - OpenBLAS acceleration available via system packages
+#   - Recommended system packages (install before pip):
+#       sudo apt install -y build-essential cmake git wget \
+#           python3-dev python3-pip python3-venv \
+#           libopenblas-dev pkg-config
+#
+#   - Note: llama-cpp-python NOT in requirements (handled via llama.cpp build)
+#   - If using llama-cpp-python (optional):
+#       CMAKE_ARGS="-DLLAMA_BLAS=ON -DLLAMA_BLAS_VENDOR=OpenBLAS" \
+#           pip install llama-cpp-python --no-cache-dir
+#
+# Installation:
+#   Development (macOS/Linux/Windows):
+#       pip install -r requirements.txt
+#
+#   Raspberry Pi (automated):
+#       ./scripts/deployment/pi_setup.sh
+#
+#   Raspberry Pi (manual):
+#       python3 -m venv venv
+#       source venv/bin/activate
+#       pip install --upgrade pip wheel setuptools
+#       pip install -r requirements.txt
+#
+# Platform Auto-Detection:
+#   The platform_config.py module automatically optimizes parameters:
+#   - Pi 16GB: Q5_K_M model, 2 threads, 2048 context
+#   - Pi 8GB:  Q4_K_M model, 2 threads, 1024 context
+#   - Desktop: Q5_K_M model, 8 threads, 4096 context
