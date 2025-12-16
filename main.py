@@ -6,7 +6,11 @@ Main entry point for the cascading math solver system.
 Architecture:
     Layer 1: SymPy (fast, offline symbolic math)
     Layer 2: Wolfram Alpha (comprehensive, online API)
-    Layer 3: DeepSeek-Math-7B-Instruct (LLM fallback, offline)
+    Layer 3: Qwen2.5-Math-7B-Instruct (LLM fallback, offline)
+
+Supported Models (auto-detected):
+    - Qwen2.5-Math-7B-Instruct Q5_K_M (recommended for 16GB RAM)
+    - Qwen2.5-Math-7B-Instruct Q4_K_M (recommended for 8GB RAM)
 
 Usage:
     python main.py --query "Solve for x: 2x + 5 = 13"

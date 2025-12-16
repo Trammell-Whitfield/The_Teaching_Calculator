@@ -29,7 +29,8 @@ class PlatformConfig:
         # Detect platform type
         self.is_raspberry_pi = self._detect_raspberry_pi()
         self.is_arm = self.machine in ['aarch64', 'armv7l', 'arm64']
-        self.is_desktop = not self.is_arm
+        # macOS (Darwin) on ARM (M-series) is still a desktop/laptop
+        self.is_desktop = not self.is_arm or self.system == 'darwin'
 
         # Determine optimal configuration
         self.config = self._build_config()
@@ -127,14 +128,24 @@ class PlatformConfig:
 
     def _generic_arm_config(self) -> Dict[str, Any]:
         """Configuration for generic ARM devices (not Pi-specific)."""
+        # Prefer Q5 for better quality if enough RAM
+        if self.total_ram_gb >= 12:
+            preferred_quant = 'q5km'
+            fallback_quant = 'q4km'
+        else:
+            preferred_quant = 'q4km'
+            fallback_quant = 'q5km'
+
         return {
             'platform': 'generic_arm',
             'description': f'ARM device ({self.total_ram_gb:.1f}GB RAM)',
 
-            'preferred_quantization': 'q4km',
+            'preferred_quantization': preferred_quant,
             'model_preference_order': [
-                'qwen2.5-math-7b-instruct-q4km.gguf',
-                'deepseek-math-7b-q4km.gguf',
+                f'qwen2.5-math-7b-instruct-{preferred_quant}.gguf',
+                f'qwen2.5-math-7b-instruct-{fallback_quant}.gguf',
+                f'deepseek-math-7b-{preferred_quant}.gguf',
+                f'deepseek-math-7b-{fallback_quant}.gguf',
             ],
 
             'n_threads': min(4, self.cpu_count),
