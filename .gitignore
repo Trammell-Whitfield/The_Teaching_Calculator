@@ -85,3 +85,26 @@ pi-stats-app/*.local
 *.tmp
 *.bak
 *.swp
+
+# ============================================================================
+# Documentation & Guides (Keep local, don't push to repo or deploy to Pi)
+# ============================================================================
+
+# All markdown files
+*.md
+
+# All text files
+*.txt
+
+# Specific exceptions (uncomment if you want to include these)
+# !README.md
+# !CONTRIBUTING.md
+# !LICENSE.md
+
+# Development/testing documentation
+model_comparison_*.json
+test_*.py
+*_OLD_PROTOTYPE.py
+
+# Cache directory (runtime only, not for git)
+cache/
