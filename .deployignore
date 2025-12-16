@@ -1,0 +1,105 @@
+# ============================================================================
+# Deploy Ignore - Files NOT to transfer to Raspberry Pi
+# Used by scripts/deploy_to_pi.sh
+# ============================================================================
+
+# Git
+.git/
+.gitignore
+
+# Python bytecode & cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments (will be created on Pi)
+venv/
+env/
+ENV/
+CALC_env/
+.venv/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs & runtime data
+logs/
+*.log
+cache/
+data/
+
+# Personal documentation (keep on Mac for reference)
+*_SUMMARY.md
+*_VERIFICATION.md
+*_COMPLETE.md
+SESSION_SUMMARY.md
+PROJECT_STATUS.md
+PRE_DEPLOYMENT_SUMMARY.md
+CACHE_INTEGRATION_SUMMARY.md
+QUERY_CLASSIFIER_SUMMARY.md
+TI84_INTEGRATION_SUMMARY.md
+PI_STATS_VERIFICATION.md
+PI_MIGRATION_COMPLETE.md
+PI_DEPLOYMENT_FILES.md
+NEXT_STEPS.md
+WHERE_IS_EVERYTHING.md
+RASPBERRY_PI_DEPLOYMENT.md
+MQTT_QUICKSTART.md
+ESP32_MQTT_SUMMARY.md
+QUICKSTART_MODEL_COMPARISON.md
+QUICKSTART_PI.md
+HOW_TO_PREPARE_FOR_PI.md
+
+# Development/test files
+test_*.py
+*_OLD_PROTOTYPE.py
+model_comparison_*.json
+
+# Environment variables (will be configured on Pi)
+.env
+.env.local
+.env.*.local
+
+# Models (too large, deploy separately with SCP)
+models/base/
+models/quantized/*-f16.gguf
+models/quantized/deepseek-*.gguf
+models/quantized/SHA256SUMS
+
+# Build artifacts (will be built on Pi)
+llama.cpp/build/
+llama.cpp/.git/
+build/
+dist/
+*.egg-info/
+
+# Node.js (pi-stats-app frontend - optional)
+pi-stats-app/node_modules/
+pi-stats-app/.next/
+pi-stats-app/out/
+pi-stats-app/build/
+pi-stats-app/*.local
+
+# Temporary files
+*.tmp
+*.bak
+
+# ============================================================================
+# KEEP THESE (Essential for Pi):
+# ============================================================================
+# main.py
+# requirements.txt
+# requirements_mqtt.txt
+# scripts/
+# pi-stats-app/backend/
+# llama.cpp/ (source code)
+# docs/ESP32_CIRCUIT_DIAGRAM.md
+# docs/MQTT_SETUP_GUIDE.md
+# README.md (basic project info)
