@@ -1,16 +1,23 @@
 # 📁 Holy Calculator - File Location Guide
 
-**Project Location**: `/Users/elhoyabembe/Documents/GitHub/Holy_Calculator/`
+**Project Location**: `/Users/elhoyabembe/Documents/GitHub/Holy-calc-pi/`
 
-## 🎯 **THE MOST IMPORTANT FILE** (for Raspberry Pi)
+## 🎯 **THE MOST IMPORTANT FILES** (for Raspberry Pi)
 
-This is what you'll transfer to your Pi:
-
+**RECOMMENDED MODEL** (Best Performance):
 ```
-/Users/elhoyabembe/Documents/GitHub/Holy_Calculator/models/quantized/deepseek-math-7b-q4km.gguf
+/Users/elhoyabembe/Documents/GitHub/Holy-calc-pi/models/quantized/qwen2.5-math-7b-instruct-q5km.gguf
 ```
-**Size**: 3.9 GB
-**Purpose**: Quantized LLM model for offline mathematical reasoning
+**Size**: 5.1 GB
+**Purpose**: Qwen2.5-Math Q5_K_M quantized model - Superior accuracy for mathematical reasoning
+**Status**: ✅ READY TO USE (PREFERRED)
+
+**BACKUP MODEL** (Smaller, Faster):
+```
+/Users/elhoyabembe/Documents/GitHub/Holy-calc-pi/models/quantized/qwen2.5-math-7b-instruct-q4km.gguf
+```
+**Size**: 4.4 GB
+**Purpose**: Qwen2.5-Math Q4_K_M quantized - Good balance of speed and accuracy
 **Status**: ✅ READY TO USE
 
 ---
@@ -18,28 +25,29 @@ This is what you'll transfer to your Pi:
 ## 📂 Complete Directory Structure
 
 ```
-/Users/elhoyabembe/Documents/GitHub/Holy_Calculator/
+/Users/elhoyabembe/Documents/GitHub/Holy-calc-pi/
 │
 ├── 📋 README.md                    # Project overview
 ├── 📋 WHERE_IS_EVERYTHING.md       # This file!
 ├── 📋 requirements.txt             # Python dependencies
+├── 📋 requirements_mqtt.txt        # MQTT/IoT dependencies
 ├── 📋 .gitignore                   # Git ignore rules
+├── 📋 main.py                      # Main calculator application (10KB)
 │
-├── 📁 models/                      # AI Models (26GB total)
-│   ├── base/                       # Original downloaded model
-│   │   └── deepseek-math-7b-instruct/    # 12.9 GB (PyTorch format)
-│   │       ├── pytorch_model-00001-of-00002.bin  (9.3GB)
-│   │       ├── pytorch_model-00002-of-00002.bin  (3.6GB)
-│   │       ├── config.json
-│   │       ├── tokenizer.json
-│   │       └── [other config files]
+├── 📁 models/                      # AI Models (~86GB total)
+│   ├── base/                       # Original downloaded models (HuggingFace format)
+│   │   ├── deepseek-math-7b-instruct/     # DeepSeek-Math base model
+│   │   └── Qwen2.5-Math-7B-Instruct/      # Qwen2.5-Math base model
 │   │
-│   └── quantized/                  # Quantized models for deployment
-│       ├── deepseek-math-7b-f16.gguf      # 13 GB (intermediate)
-│       ├── deepseek-math-7b-q4km.gguf     # 3.9 GB ⭐ USE THIS ON PI!
-│       └── deepseek-math-7b-q5km.gguf     # ~4.8 GB (backup, creating...)
+│   └── quantized/                  # Quantized GGUF models for deployment
+│       ├── deepseek-math-7b-f16.gguf      # 13 GB (full precision)
+│       ├── deepseek-math-7b-q4km.gguf     # 3.9 GB
+│       ├── deepseek-math-7b-q5km.gguf     # 4.6 GB
+│       ├── qwen2.5-math-7b-instruct-f16.gguf   # 14 GB (full precision)
+│       ├── qwen2.5-math-7b-instruct-q4km.gguf  # 4.4 GB
+│       └── qwen2.5-math-7b-instruct-q5km.gguf  # 5.1 GB ⭐ BEST FOR PI!
 │
-├── 📁 llama.cpp/                   # LLM Inference Engine
+├── 📁 llama.cpp/                   # LLM Inference Engine (~478MB)
 │   ├── build/bin/
 │   │   ├── llama-cli               # Run LLM inference
 │   │   ├── llama-quantize          # Quantize models
@@ -48,45 +56,61 @@ This is what you'll transfer to your Pi:
 │   ├── convert_hf_to_gguf.py       # PyTorch → GGUF converter
 │   └── [source code]
 │
-├── 📁 scripts/                     # Python Scripts
+├── 📁 scripts/                     # Python Scripts (~612KB)
 │   ├── download_model.py           # Downloads models from HuggingFace
-│   ├── cascade/                    # (Empty - Phase 7)
-│   │   └── [future: SymPy, Wolfram, LLM handlers]
-│   ├── monitoring/                 # (Empty - Phase 3)
-│   │   └── [future: performance monitoring]
-│   └── testing/                    # (Empty - Phase 4)
-│       └── [future: test suites]
+│   ├── compare_llm_models.py       # LLM model comparison tool
+│   ├── setup_mqtt.sh               # MQTT broker setup
+│   ├── validate_dependencies.sh    # Dependency checker
+│   ├── cascade/                    # Math solving cascade
+│   │   ├── cascade_orchestrator.py # Main orchestrator
+│   │   ├── llm_handler.py          # LLM integration
+│   │   ├── sympy_handler.py        # SymPy solver
+│   │   └── wolfram_handler.py      # Wolfram Alpha API
+│   ├── cache/                      # Query caching system
+│   │   └── query_cache.py          # Cache implementation
+│   ├── hardware/                   # TI-84 integration
+│   │   ├── ti84_interface.py       # TI-84 serial interface
+│   │   └── ti84_protocol.py        # TI-84 protocol handler
+│   ├── monitoring/                 # Performance monitoring
+│   │   └── [monitoring scripts]
+│   └── testing/                    # Test suites
+│       └── [test files]
 │
-├── 📁 data/                        # Test Data
-│   └── test-cases/                 # (Empty - Phase 3)
-│       └── [future: math-problems.yaml]
+├── 📁 data/                        # Test Data & Configuration
+│   ├── test-cases/                 # Test problem sets
+│   └── config/                     # Configuration files
 │
-├── 📁 docs/                        # Documentation
+├── 📁 cache/                       # Query Cache Storage
+│   └── [cached responses]
+│
+├── 📁 docs/                        # Documentation (~348KB)
 │   ├── mac-system-baseline.txt     # Your Mac specs
-│   ├── llamacpp-version.txt        # llama.cpp version
-│   ├── build-config.txt            # Build configuration
-│   ├── base-model-manifest.txt     # List of model files
 │   ├── phase0-completion-summary.md
 │   ├── phase1-summary.md
-│   ├── offline-pi-deployment-plan.md  # ⭐ Important!
+│   ├── phase2-completion-summary.md
+│   ├── offline-pi-deployment-plan.md
 │   ├── project-status-summary.md
-│   └── WHERE_IS_EVERYTHING.md      # This file
+│   └── [25+ other documentation files]
 │
-├── 📁 logs/                        # Build & Test Logs
+├── 📁 logs/                        # Build & Test Logs (~156KB)
 │   ├── model-download.log          # Download log
 │   ├── gguf-conversion.log         # GGUF conversion log
-│   ├── quantize-q4km.log           # Q4 quantization log
-│   └── quantize-q5km.log           # Q5 quantization log (creating...)
+│   ├── quantize-q4km.log           # Quantization logs
+│   └── [other logs]
 │
-└── 📁 venv/                        # Python Virtual Environment
-    ├── bin/
-    │   └── python3                 # Python interpreter
-    └── lib/python3.9/site-packages/
-        ├── sympy/                  # Symbolic mathematics
-        ├── numpy/                  # Numerical computing
-        ├── torch/                  # PyTorch
-        ├── transformers/           # HuggingFace transformers
-        └── [other packages]
+├── 📁 pi-stats-app/                # Raspberry Pi monitoring app (~144KB)
+│   ├── app.py                      # Flask web dashboard
+│   └── [frontend files]
+│
+├── 📁 venv/                        # Python Virtual Environment (~162MB)
+│   ├── bin/python3                 # Python interpreter
+│   └── lib/python3.x/site-packages/
+│       ├── sympy/                  # Symbolic mathematics
+│       ├── numpy/                  # Numerical computing
+│       └── [other packages]
+│
+└── 📁 CALC_env/                    # Alternative virtual environment (~874MB)
+    └── [conda/alternative env]
 ```
 
 ---
@@ -97,42 +121,54 @@ This is what you'll transfer to your Pi:
 
 **Activate Python environment:**
 ```bash
-cd /Users/elhoyabembe/Documents/GitHub/Holy_Calculator
+cd /Users/elhoyabembe/Documents/GitHub/Holy-calc-pi
 source venv/bin/activate
 ```
 
-**Test LLM locally:**
+**Test LLM locally (Qwen2.5-Math - RECOMMENDED):**
 ```bash
 cd llama.cpp
 ./build/bin/llama-cli \
-  -m ../models/quantized/deepseek-math-7b-q4km.gguf \
+  -m ../models/quantized/qwen2.5-math-7b-instruct-q5km.gguf \
   -p "Solve for x: 2x + 5 = 13" \
   -n 100
 ```
 
-**Run Python scripts:**
+**Run main calculator:**
 ```bash
-python3 scripts/download_model.py
+python3 main.py
+```
+
+**Compare LLM models:**
+```bash
+python3 scripts/compare_llm_models.py
 ```
 
 ### Transfer to Raspberry Pi
 
 **What to copy:**
-1. `models/quantized/deepseek-math-7b-q4km.gguf` (3.9 GB) ⭐ ESSENTIAL
-2. `scripts/` folder (all Python code)
-3. `requirements.txt` (Python dependencies)
-4. llama.cpp binaries (rebuild on Pi or cross-compile)
+1. **ESSENTIAL**: `models/quantized/qwen2.5-math-7b-instruct-q5km.gguf` (5.1 GB) ⭐
+2. **BACKUP**: `models/quantized/qwen2.5-math-7b-instruct-q4km.gguf` (4.4 GB)
+3. `main.py` - Main calculator application
+4. `scripts/` folder - All Python code
+5. `requirements.txt` & `requirements_mqtt.txt` - Dependencies
+6. llama.cpp binaries (rebuild on Pi or cross-compile)
 
 **Transfer methods:**
 ```bash
 # Option 1: USB Drive
-cp models/quantized/deepseek-math-7b-q4km.gguf /Volumes/USB_DRIVE/
+cp models/quantized/qwen2.5-math-7b-instruct-q5km.gguf /Volumes/USB_DRIVE/
 
 # Option 2: SCP (one-time WiFi)
-scp models/quantized/deepseek-math-7b-q4km.gguf pi@raspberrypi.local:~/
+scp models/quantized/qwen2.5-math-7b-instruct-q5km.gguf pi@raspberrypi.local:~/
 
 # Option 3: SD Card (before booting Pi)
-# Mount SD card and copy directly
+# Mount SD card and copy directly to /boot or /home partition
+```
+
+**Quick deployment script:**
+```bash
+# See DEPLOY_CHEATSHEET.md and MODEL_TRANSFER_GUIDE.md for detailed instructions
 ```
 
 ---
@@ -141,34 +177,51 @@ scp models/quantized/deepseek-math-7b-q4km.gguf pi@raspberrypi.local:~/
 
 | Location | Size | Keep on Mac? | Transfer to Pi? |
 |----------|------|--------------|-----------------|
-| `models/base/` | 12.9 GB | ✅ Yes (for re-quantization) | ❌ No |
+| `models/base/deepseek-math-7b-instruct/` | ~13 GB | ✅ Yes | ❌ No |
+| `models/base/Qwen2.5-Math-7B-Instruct/` | ~14 GB | ✅ Yes | ❌ No |
 | `models/quantized/deepseek-math-7b-f16.gguf` | 13 GB | ⚠️ Optional | ❌ No |
-| `models/quantized/deepseek-math-7b-q4km.gguf` | 3.9 GB | ✅ Yes | ✅ **YES!** |
-| `models/quantized/deepseek-math-7b-q5km.gguf` | ~4.8 GB | ✅ Yes (backup) | ⚠️ Optional |
-| `llama.cpp/` | ~500 MB | ✅ Yes | ✅ Yes (rebuild) |
-| `scripts/` | ~5 MB | ✅ Yes | ✅ Yes |
-| `venv/` | ~1 GB | ✅ Yes | ❌ No (rebuild on Pi) |
-| **TOTAL** | ~31 GB | | **~4.5 GB** |
+| `models/quantized/deepseek-math-7b-q4km.gguf` | 3.9 GB | ✅ Yes | ⚠️ Optional |
+| `models/quantized/deepseek-math-7b-q5km.gguf` | 4.6 GB | ✅ Yes | ⚠️ Optional |
+| `models/quantized/qwen2.5-math-7b-instruct-f16.gguf` | 14 GB | ⚠️ Optional | ❌ No |
+| `models/quantized/qwen2.5-math-7b-instruct-q4km.gguf` | 4.4 GB | ✅ Yes | ✅ Backup |
+| `models/quantized/qwen2.5-math-7b-instruct-q5km.gguf` | 5.1 GB | ✅ Yes | ✅ **PRIMARY!** |
+| `llama.cpp/` | 478 MB | ✅ Yes | ✅ Yes (rebuild) |
+| `scripts/` | 612 KB | ✅ Yes | ✅ Yes |
+| `main.py` | 10 KB | ✅ Yes | ✅ Yes |
+| `venv/` | 162 MB | ✅ Yes | ❌ No (rebuild on Pi) |
+| `CALC_env/` | 874 MB | ⚠️ Optional | ❌ No |
+| **TOTAL** | ~86 GB | | **~5-10 GB** |
 
 ---
 
 ## 🔑 Key Files Explained
 
 ### For Development (Mac)
+- `main.py` - Main calculator orchestrator with cascade logic
 - `llama.cpp/build/bin/llama-cli` - Test LLM inference
+- `scripts/compare_llm_models.py` - Compare model performance
 - `scripts/download_model.py` - Download models from HuggingFace
-- `requirements.txt` - Install Python packages (`pip install -r requirements.txt`)
+- `requirements.txt` - Python packages (`pip install -r requirements.txt`)
 - `venv/` - Isolated Python environment
 
 ### For Deployment (Pi)
-- `models/quantized/deepseek-math-7b-q4km.gguf` - THE quantized model
-- `scripts/cascade/` - (Future) SymPy → Wolfram → LLM logic
-- `scripts/hardware/` - (Future) TI-84 interface
+- `models/quantized/qwen2.5-math-7b-instruct-q5km.gguf` - **PRIMARY** model (best accuracy)
+- `models/quantized/qwen2.5-math-7b-instruct-q4km.gguf` - Backup model (faster)
+- `main.py` - Main calculator application
+- `scripts/cascade/cascade_orchestrator.py` - SymPy → Wolfram → LLM cascade logic
+- `scripts/cascade/sympy_handler.py` - Symbolic math solver
+- `scripts/cascade/llm_handler.py` - LLM integration
+- `scripts/hardware/ti84_interface.py` - TI-84 serial interface
+- `scripts/cache/query_cache.py` - Response caching system
 
 ### Documentation
-- `docs/offline-pi-deployment-plan.md` - How to deploy without WiFi
+- `WHERE_IS_EVERYTHING.md` - This file (complete project map)
+- `DEPLOY_CHEATSHEET.md` - Quick deployment reference
+- `MODEL_TRANSFER_GUIDE.md` - How to transfer models to Pi
+- `QUICK_REFERENCE.md` - Common commands and operations
+- `QUICKSTART_PI.md` - Raspberry Pi setup guide
+- `docs/offline-pi-deployment-plan.md` - Offline deployment strategy
 - `docs/project-status-summary.md` - Current project status
-- `docs/phase1-summary.md` - What we've completed
 
 ---
 
@@ -177,14 +230,17 @@ scp models/quantized/deepseek-math-7b-q4km.gguf pi@raspberrypi.local:~/
 Your project is a Git repository:
 
 ```bash
-cd /Users/elhoyabembe/Documents/GitHub/Holy_Calculator
+cd /Users/elhoyabembe/Documents/GitHub/Holy-calc-pi
 git status
 git log
 ```
 
 **Recent commits:**
-1. Phase 0: Environment setup
-2. Phase 1: Model download complete
+- Switch to Qwen2.5-Math models with Q5_K_M preferred quantization
+- Create validate_dependencies.sh
+- Create compare_llm_models.py
+- Create setup_mqtt.sh
+- Multiple phase completions and documentation updates
 
 ---
 
@@ -192,7 +248,7 @@ git log
 
 ### See what's taking up space:
 ```bash
-cd /Users/elhoyabembe/Documents/GitHub/Holy_Calculator
+cd /Users/elhoyabembe/Documents/GitHub/Holy-calc-pi
 du -sh *
 ```
 
@@ -205,6 +261,7 @@ ls -lh models/quantized/
 ```bash
 cd llama.cpp
 ./build/bin/llama-cli --version
+./build/bin/llama-cli -m ../models/quantized/qwen2.5-math-7b-instruct-q5km.gguf -p "2+2" -n 50
 ```
 
 ### Update Python requirements:
@@ -213,19 +270,48 @@ source venv/bin/activate
 pip freeze > requirements.txt
 ```
 
+### Run model comparison:
+```bash
+python3 scripts/compare_llm_models.py
+```
+
+### Validate dependencies before Pi transfer:
+```bash
+bash scripts/validate_dependencies.sh
+```
+
 ---
 
-## 🌟 Next Steps
+## 🌟 Project Status & Next Steps
 
-1. **Phase 2 Complete**: Wait for Q5_K_M to finish quantizing (~5 min)
-2. **Phase 3-4**: Set up monitoring and testing
-3. **Phase 5**: Build SymPy integration (offline math solver)
-4. **Phase 6**: Wolfram Alpha integration (optional, needs internet)
-5. **Phase 7**: Cascade orchestrator (SymPy → Wolfram → LLM)
-6. **Phase 8**: Transfer to Raspberry Pi and test offline!
+### ✅ Completed
+- Phase 0: Environment setup (Mac + Python + llama.cpp)
+- Phase 1: Model download (both DeepSeek-Math and Qwen2.5-Math)
+- Phase 2: Model quantization (Q4_K_M and Q5_K_M variants)
+- Phase 3: Model comparison testing (Qwen2.5 Q5_K_M is best)
+- Phase 4: Cascade orchestrator (SymPy → Wolfram → LLM)
+- Phase 5: Query caching system
+- Phase 6: TI-84 interface implementation
+- Phase 7: MQTT integration for IoT
+- Phase 8: Pi monitoring dashboard
+
+### 🔄 In Progress
+- Final testing and optimization
+- Documentation refinement
+
+### 📋 Ready for Deployment
+- Transfer Qwen2.5-Math Q5_K_M model to Raspberry Pi
+- Set up offline calculator on Pi
+- Test complete cascade system on Pi hardware
+
+### 🎯 Optional Enhancements
+- ESP32 integration for wireless display
+- Enhanced caching strategies
+- Additional model fine-tuning
 
 ---
 
-**Last Updated**: November 28, 2025
-**Project Status**: Phase 2 nearly complete (90%)
-**Ready for Pi?**: Almost! (need to build cascade logic first)
+**Last Updated**: December 17, 2025
+**Project Status**: READY FOR RASPBERRY PI DEPLOYMENT
+**Primary Model**: Qwen2.5-Math-7B Q5_K_M (5.1 GB)
+**Total Project Size**: ~86 GB (Mac) → ~5-10 GB (Pi transfer)
