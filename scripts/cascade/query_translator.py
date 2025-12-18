@@ -397,7 +397,7 @@ class QueryTranslator:
         Handles:
         - x^2 → x**2 (exponentiation)
         - 2x → 2*x (implicit multiplication)
-        - sin, cos, tan, etc.
+        - sin, cos, tan, etc. (preserved as function calls)
         """
         # Replace ^ with **
         expr = expr.replace('^', '**')
@@ -409,8 +409,23 @@ class QueryTranslator:
         # Pattern: closing paren followed by letter/digit
         expr = re.sub(r'\)(\w)', r')*\1', expr)
 
-        # Pattern: letter/digit followed by opening paren
-        expr = re.sub(r'(\w)\(', r'\1*(', expr)
+        # Pattern: single letter/digit followed by opening paren → implicit multiplication
+        # BUT preserve known function names (sin, cos, tan, log, etc.)
+        known_functions = r'(?:sin|cos|tan|sec|csc|cot|asin|acos|atan|' \
+                         r'sinh|cosh|tanh|log|ln|exp|sqrt|abs|' \
+                         r'diff|integrate|limit|solve|factor|expand|simplify)'
+
+        # Only add * if NOT preceded by a known function name
+        # Match: single letter or digit followed by (, but not if it's part of a function name
+        def add_multiplication(match):
+            """Helper to selectively add multiplication."""
+            char = match.group(1)
+            # If it's a single character (not part of a longer word), add *
+            return f"{char}*("
+
+        # Only apply to single characters followed by (
+        # This preserves "cos(" but converts "x(" to "x*("
+        expr = re.sub(rf'(?<!{known_functions})(\b\w)\(', add_multiplication, expr)
 
         return expr
 

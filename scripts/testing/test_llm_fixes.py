@@ -134,7 +134,7 @@ def test_llm_query():
         print(f"\n  Query: {test_query[:60]}...")
 
         start_time = time.time()
-        result = handler.query(test_query)
+        result = handler.process_query(test_query)
         elapsed = time.time() - start_time
 
         print(f"\n  Results:")
