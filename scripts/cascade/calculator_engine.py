@@ -27,6 +27,7 @@ from sympy_handler import SymPyHandler
 from wolfram_handler import WolframAlphaHandler
 from llm_handler import LLMHandler
 from query_cache import SmartCache
+from query_translator import QueryTranslator
 
 
 class MathQueryRouter:
@@ -155,6 +156,10 @@ class CalculatorEngine:
             enable_cache: Enable query result caching (default: True)
         """
         self.logger = logging.getLogger(__name__)
+
+        # Initialize query translator
+        self.translator = QueryTranslator()
+        self.logger.info("✓ Query translator initialized")
 
         # Initialize cache
         self.cache = None
@@ -343,9 +348,21 @@ class CalculatorEngine:
         }
 
     def _try_sympy(self, query: str) -> Optional[Dict[str, Any]]:
-        """Try solving with SymPy."""
+        """Try solving with SymPy using translated format."""
         try:
-            return self.sympy.process_query(query)
+            # Translate query to SymPy-compatible format
+            translated = self.translator.translate(query)
+            self.logger.debug(f"Translated to SymPy format: {translated['sympy_format']}")
+
+            # Use translated format for known operations, original for general
+            if translated['operation'] in ['derivative', 'second_derivative', 'third_derivative',
+                                           'integral', 'limit', 'solve', 'simplify',
+                                           'factor', 'expand']:
+                query_to_process = translated['sympy_format']
+            else:
+                query_to_process = query
+
+            return self.sympy.process_query(query_to_process)
         except Exception as e:
             self.logger.debug(f"SymPy error: {e}")
             return None
@@ -359,9 +376,16 @@ class CalculatorEngine:
             return None
 
     def _try_llm(self, query: str) -> Optional[Dict[str, Any]]:
-        """Try solving with LLM."""
+        """Try solving with LLM using optimized prompt format."""
         try:
-            return self.llm.process_query(query)
+            # Translate query to LLM-optimized format
+            translated = self.translator.translate(query)
+            self.logger.debug(f"Using LLM-optimized prompt format")
+
+            # Use LLM-formatted prompt which encourages proper answer formatting
+            query_to_process = translated['llm_format']
+
+            return self.llm.process_query(query_to_process)
         except Exception as e:
             self.logger.debug(f"LLM error: {e}")
             return None
