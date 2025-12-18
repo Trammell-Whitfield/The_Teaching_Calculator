@@ -70,7 +70,7 @@ class LLMHandler:
             'temperature': platform_params['temperature'],
             'top_p': 0.9,
             'top_k': 40,
-            'repeat_penalty': 1.1,
+            'repeat_penalty': 1.15,  # Increased from 1.1 to prevent repetitive loops
             'threads': platform_params['n_threads'],
             'n_ctx': platform_params.get('n_ctx', 2048),
         }
@@ -207,10 +207,22 @@ Solution:"""
             # Extract the response (llama.cpp outputs the prompt + completion)
             full_output = result.stdout
 
-            # Try to extract just the answer part (after "Solution:")
-            if 'Solution:' in full_output:
-                answer = full_output.split('Solution:', 1)[1].strip()
-            else:
+            # Debug: Print raw output to help diagnose extraction issues
+            if os.environ.get('DEBUG_LLM'):
+                print(f"\n{'='*70}")
+                print("RAW LLM OUTPUT:")
+                print(f"{'='*70}")
+                print(full_output)
+                print(f"{'='*70}\n")
+
+            # Extract answer using multiple patterns
+            answer = self._extract_answer(full_output)
+
+            # If extraction failed, log it for debugging
+            if answer is None:
+                print(f"⚠ WARNING: Failed to extract answer from LLM output")
+                print(f"Last 200 characters: {full_output[-200:]}")
+                # Return full output as fallback
                 answer = full_output.strip()
 
             # Extract basic metadata (tokens generated)
@@ -238,6 +250,68 @@ Solution:"""
                 'error': f"LLM error: {str(e)}",
                 'source': 'llm'
             }
+
+    def _extract_answer(self, text: str) -> Optional[str]:
+        """
+        Extract mathematical answer from LLM output using multiple patterns.
+
+        Tries various common answer formats used by math LLMs:
+        - "The answer is: X"
+        - "#### X" (GSM8K format)
+        - "\\boxed{X}" (LaTeX format)
+        - "Therefore, X"
+        - "Solution: X"
+        - "= X" (equation format)
+
+        Args:
+            text: Raw LLM output
+
+        Returns:
+            Extracted answer string, or None if no pattern matches
+        """
+        # List of patterns to try, in order of preference
+        patterns = [
+            # Explicit answer markers
+            r"(?:The answer is|Answer:|Final answer:)\s*\**\s*([^\n]+)",
+            r"####\s*([^\n]+)",  # GSM8K format
+            r"\\boxed\{([^}]+)\}",  # LaTeX boxed format
+
+            # Common conclusion phrases
+            r"Therefore,?\s+([^\n.]+)[.\n]",
+            r"Thus,?\s+([^\n.]+)[.\n]",
+            r"So,?\s+([^\n.]+)[.\n]",
+
+            # Solution markers
+            r"Solution:\s*([^\n]+)",
+            r"Result:\s*([^\n]+)",
+
+            # Equation format (equals sign)
+            r"=\s*([0-9.x\-+*/^()]+)\s*(?:\n|$)",
+
+            # Last resort: look for conclusion after steps
+            r"Step \d+.*?\n\s*([^\n]+)$",
+        ]
+
+        for pattern in patterns:
+            match = re.search(pattern, text, re.IGNORECASE | re.MULTILINE)
+            if match:
+                answer = match.group(1).strip()
+                # Remove asterisks (markdown bold)
+                answer = answer.strip('*')
+                # Remove trailing periods
+                answer = answer.rstrip('.')
+
+                if os.environ.get('DEBUG_LLM'):
+                    print(f"✓ Extracted answer using pattern: {pattern[:50]}...")
+                    print(f"  Answer: {answer}")
+
+                return answer
+
+        # No pattern matched
+        if os.environ.get('DEBUG_LLM'):
+            print(f"✗ No extraction pattern matched")
+
+        return None
 
     def get_stats(self) -> Dict[str, Any]:
         """Get handler statistics."""
