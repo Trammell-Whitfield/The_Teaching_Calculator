@@ -105,11 +105,11 @@ class PlatformConfig:
                 'deepseek-math-7b-q4km.gguf',
             ],
 
-            # Inference parameters (conservative for battery/thermal)
+            # Inference parameters (optimized for math queries)
             'n_threads': 2,  # Low to prevent thermal throttling
             'n_ctx': context_window,
-            'n_predict': 512,
-            'temperature': 0.1,
+            'n_predict': 256,  # Reduced from 512 - math answers are usually concise
+            'temperature': 0.3,  # Increased from 0.1 - prevents reasoning loops
 
             # Memory management
             'use_mmap': True,  # Essential for fast model loading
@@ -150,8 +150,8 @@ class PlatformConfig:
 
             'n_threads': min(4, self.cpu_count),
             'n_ctx': 2048,
-            'n_predict': 512,
-            'temperature': 0.1,
+            'n_predict': 256,  # Reduced from 512 - math answers are usually concise
+            'temperature': 0.3,  # Increased from 0.1 - prevents reasoning loops
 
             'use_mmap': True,
             'use_mlock': False,
@@ -188,8 +188,8 @@ class PlatformConfig:
             # Desktop: use more threads for speed
             'n_threads': min(8, self.cpu_count),
             'n_ctx': 4096,  # Larger context window
-            'n_predict': 1024,
-            'temperature': 0.1,
+            'n_predict': 256,  # Reduced from 1024 - math answers are usually concise
+            'temperature': 0.3,  # Increased from 0.1 - prevents reasoning loops
 
             'use_mmap': True,
             'use_mlock': False,
