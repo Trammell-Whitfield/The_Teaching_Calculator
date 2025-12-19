@@ -106,7 +106,7 @@ class PlatformConfig:
             ],
 
             # Inference parameters (optimized for math queries)
-            'n_threads': 2,  # Low to prevent thermal throttling
+            'n_threads': 4,  # Increased from 2 - safe with good cooling (<70°C)
             'n_ctx': context_window,
             'n_predict': 256,  # Reduced from 512 - math answers are usually concise
             'temperature': 0.3,  # Increased from 0.1 - prevents reasoning loops
@@ -117,7 +117,7 @@ class PlatformConfig:
             'n_gpu_layers': 0,  # No GPU on Pi
 
             # Performance expectations
-            'expected_tokens_per_sec': 2.0,  # 1-3 tok/s typical
+            'expected_tokens_per_sec': 3.5,  # 2-5 tok/s with optimized build & 4 threads
             'model_load_time_sec': 20,  # 15-25s typical
             'thermal_threshold_celsius': 80,  # Start warning at 80°C
 
