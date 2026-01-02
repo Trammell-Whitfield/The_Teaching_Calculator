@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-TI-84 Plus CE USB Serial Interface
+MathBridge - TI-84 Plus CE USB Serial Interface
 Receives math queries from TI-84 calculator and sends back solutions.
 """
 
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 class TI84Interface:
     """Interface for communicating with TI-84 Plus CE calculator."""
 
-    def __init__(self, port=None, baud_rate=9600, enable_wolfram=False):
+    def __init__(self, port=None, baud_rate=9600, enable_wolfram=False, esp32_mode=False):
         """
         Initialize TI-84 interface.
 
@@ -35,15 +35,30 @@ class TI84Interface:
             port: Serial port (auto-detects if None)
             baud_rate: Communication speed (default 9600)
             enable_wolfram: Enable Wolfram Alpha layer
+            esp32_mode: Use ESP32 bridge protocol (future enhancement)
         """
         self.port = port or self._find_ti84_port()
         self.baud_rate = baud_rate
         self.serial_conn = None
+        self.esp32_mode = esp32_mode
+
+        # Query statistics
+        self.stats = {
+            'total_queries': 0,
+            'sympy_queries': 0,
+            'llm_queries': 0,
+            'cascade_queries': 0,
+            'errors': 0,
+            'avg_response_time': 0.0
+        }
 
         # Initialize calculator engine
-        logger.info("Initializing Holy Calculator engine...")
+        logger.info("Initializing MathBridge engine...")
         self.engine = CalculatorEngine(enable_wolfram=enable_wolfram)
         logger.info("✓ Calculator engine ready")
+
+        if esp32_mode:
+            logger.info("🔌 ESP32 bridge mode enabled (UART 9600 baud)")
 
     def _find_ti84_port(self):
         """
@@ -198,7 +213,74 @@ class TI84Interface:
 
         except KeyboardInterrupt:
             logger.info("\n\nShutting down...")
+            self.print_stats()
             self.disconnect()
+
+    def _parse_template(self, query):
+        """
+        Parse template-based queries and determine routing tier.
+
+        Args:
+            query: Query string from TI-84
+
+        Returns:
+            tuple: (tier, action, cleaned_query)
+                tier: 'sympy', 'llm', or 'cascade'
+                action: specific action type
+                cleaned_query: query with template prefix removed
+        """
+        query_lower = query.lower()
+
+        # Template definitions with tier routing
+        templates = {
+            # Algebra templates → SymPy (Tier 1)
+            'solve:': ('sympy', 'solve_equation'),
+            'factor:': ('sympy', 'factor'),
+            'expand:': ('sympy', 'expand'),
+            'simplify:': ('sympy', 'simplify'),
+            'solve system:': ('sympy', 'solve_system'),
+
+            # Calculus templates → SymPy (Tier 1)
+            'derivative of': ('sympy', 'derivative'),
+            'integrate:': ('sympy', 'integrate'),
+            'limit of': ('sympy', 'limit'),
+            'taylor series of': ('sympy', 'series'),
+            'find critical points of': ('sympy', 'critical_points'),
+
+            # Explanation templates → LLM (Tier 3)
+            'explain': ('llm', 'explain'),
+            'why does': ('llm', 'explain'),
+            'how do i': ('llm', 'explain'),
+            'show steps to': ('llm', 'show_steps'),
+            'give an example of': ('llm', 'example'),
+            'compare': ('llm', 'compare'),
+
+            # Geometry templates → SymPy (Tier 1)
+            'area of': ('sympy', 'geometry'),
+            'volume of': ('sympy', 'geometry'),
+            'circumference of': ('sympy', 'geometry'),
+            'find angle:': ('sympy', 'geometry'),
+            'equation of circle:': ('sympy', 'geometry'),
+
+            # Statistics templates → SymPy (Tier 1)
+            'mean of:': ('sympy', 'statistics'),
+            'median of:': ('sympy', 'statistics'),
+            'std dev of:': ('sympy', 'statistics'),
+            'probability:': ('sympy', 'statistics'),
+            'linear regression': ('sympy', 'statistics'),
+        }
+
+        # Check for template match
+        for prefix, (tier, action) in templates.items():
+            if query_lower.startswith(prefix):
+                # Extract the actual query content
+                cleaned = query[len(prefix):].strip()
+                logger.info(f"📋 Template detected: '{prefix}' → Tier: {tier}, Action: {action}")
+                return tier, action, cleaned
+
+        # No template match - use cascade
+        logger.info(f"📋 No template - using cascade routing")
+        return 'cascade', 'auto', query
 
     def _handle_query(self, query):
         """
@@ -207,13 +289,35 @@ class TI84Interface:
         Args:
             query: Mathematical query from TI-84
         """
+        # Update statistics
+        self.stats['total_queries'] += 1
+
         # Send acknowledgment
         self.send_response("Processing...")
 
+        # Parse template to determine routing
+        tier, action, cleaned_query = self._parse_template(query)
+
+        # Update tier statistics
+        if tier == 'sympy':
+            self.stats['sympy_queries'] += 1
+        elif tier == 'llm':
+            self.stats['llm_queries'] += 1
+        else:
+            self.stats['cascade_queries'] += 1
+
+        # Use cleaned query if template was detected, otherwise use original
+        solve_query = cleaned_query if tier != 'cascade' else query
+
         # Solve using Holy Calculator
         start_time = time.time()
-        result = self.engine.solve(query)
+        result = self.engine.solve(solve_query)
         elapsed = time.time() - start_time
+
+        # Update average response time
+        total = self.stats['total_queries']
+        prev_avg = self.stats['avg_response_time']
+        self.stats['avg_response_time'] = ((prev_avg * (total - 1)) + elapsed) / total
 
         # Format and send response
         if result['success']:
@@ -233,12 +337,26 @@ class TI84Interface:
 
         else:
             # Failure - send error message
+            self.stats['errors'] += 1
             error_msg = "Error: Could not solve"
 
-            logger.warning(f"✗ Failed: {result['error']}")
+            logger.warning(f"✗ Failed: {result.get('error', 'Unknown error')}")
             logger.warning(f"📤 Sending: {error_msg}")
 
             self.send_response(error_msg)
+
+    def print_stats(self):
+        """Print query statistics."""
+        logger.info("\n" + "="*70)
+        logger.info("TI-84 INTERFACE STATISTICS")
+        logger.info("="*70)
+        logger.info(f"Total queries:      {self.stats['total_queries']}")
+        logger.info(f"  SymPy (Tier 1):   {self.stats['sympy_queries']}")
+        logger.info(f"  LLM (Tier 3):     {self.stats['llm_queries']}")
+        logger.info(f"  Cascade:          {self.stats['cascade_queries']}")
+        logger.info(f"Errors:             {self.stats['errors']}")
+        logger.info(f"Avg response time:  {self.stats['avg_response_time']:.2f}s")
+        logger.info("="*70 + "\n")
 
 
 def main():
@@ -246,7 +364,7 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="TI-84 Plus CE interface for Holy Calculator"
+        description="MathBridge - TI-84 Plus CE interface for offline math AI"
     )
     parser.add_argument(
         '--port',
@@ -269,37 +387,77 @@ def main():
         action='store_true',
         help='Test mode: simulate queries without TI-84'
     )
+    parser.add_argument(
+        '--esp32',
+        action='store_true',
+        help='ESP32 bridge mode (for 2.5mm UART connection)'
+    )
+    parser.add_argument(
+        '--stats',
+        action='store_true',
+        help='Show statistics after shutdown'
+    )
 
     args = parser.parse_args()
 
     if args.test:
-        # Test mode - simulate queries
-        logger.info("TEST MODE: Simulating TI-84 queries")
+        # Test mode - simulate queries with template demonstrations
+        logger.info("TEST MODE: Simulating TI-84 template queries")
+        logger.info("="*70)
         interface = TI84Interface(enable_wolfram=args.enable_wolfram)
 
         test_queries = [
+            # Algebra templates (SymPy - Tier 1)
             "Solve: 2x + 5 = 13",
-            "Derivative of x^2",
-            "What is 5 + 5?",
+            "Factor: x^2 + 5x + 6",
+            "Expand: (x+1)^3",
+            "Simplify: (x^2-1)/(x-1)",
+
+            # Calculus templates (SymPy - Tier 1)
+            "Derivative of x^3 + 2x",
+            "Integrate: x^2",
+            "Limit of sin(x)/x as x→0",
+
+            # Geometry templates (SymPy - Tier 1)
+            "Area of circle with radius 5",
+            "Volume of sphere radius 3",
+
+            # Explanation templates (LLM - Tier 3)
+            "Explain derivative",
+            "Show steps to solve: x^2 = 9",
+
+            # Custom query (Cascade)
+            "What is 2 + 2?",
         ]
 
-        for query in test_queries:
-            logger.info(f"\n📩 Test query: {query}")
-            interface._handle_query(query)
-            time.sleep(1)
+        logger.info(f"Running {len(test_queries)} test queries...\n")
 
-        logger.info("\n✓ Test complete")
+        for i, query in enumerate(test_queries, 1):
+            logger.info(f"\n{'─'*70}")
+            logger.info(f"Test {i}/{len(test_queries)}: {query}")
+            logger.info(f"{'─'*70}")
+            interface._handle_query(query)
+            time.sleep(0.5)
+
+        # Print statistics
+        interface.print_stats()
+        logger.info("✓ Test complete")
 
     else:
         # Real mode - connect to TI-84
         interface = TI84Interface(
             port=args.port,
             baud_rate=args.baud,
-            enable_wolfram=args.enable_wolfram
+            enable_wolfram=args.enable_wolfram,
+            esp32_mode=args.esp32
         )
 
         if interface.connect():
-            interface.listen()
+            try:
+                interface.listen()
+            except KeyboardInterrupt:
+                if args.stats:
+                    interface.print_stats()
         else:
             logger.error("Failed to connect to TI-84")
             sys.exit(1)
