@@ -108,3 +108,16 @@ test_*.py
 
 # Cache directory (runtime only, not for git)
 cache/
+
+# Evaluation and testing results
+eval_results_demo/
+eval_test_sample/
+*.png
+*.jpg
+*.jpeg
+*.svg
+
+# Specific result files
+detailed_results.json
+evaluation_metrics.json
+evaluation_report.txt
