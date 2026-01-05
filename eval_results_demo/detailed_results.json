@@ -1,0 +1,338 @@
+{
+  "classifier_metrics": {
+    "accuracy": 0.2,
+    "macro_precision": 0.5,
+    "macro_recall": 0.1,
+    "macro_f1": 0.16666666666666669,
+    "weighted_precision": 1.0,
+    "weighted_recall": 0.2,
+    "weighted_f1": 0.33333333333333337,
+    "per_tier_metrics": {
+      "sympy": {
+        "precision": 1.0,
+        "recall": 0.2,
+        "f1": 0.33333333333333337,
+        "support": 10
+      },
+      "llm": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 0
+      }
+    },
+    "confusion_matrix": [
+      [
+        2,
+        8
+      ],
+      [
+        0,
+        0
+      ]
+    ],
+    "classification_report": {
+      "sympy": {
+        "precision": 1.0,
+        "recall": 0.2,
+        "f1-score": 0.33333333333333337,
+        "support": 10.0
+      },
+      "llm": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1-score": 0.0,
+        "support": 0.0
+      },
+      "accuracy": 0.2,
+      "macro avg": {
+        "precision": 0.5,
+        "recall": 0.1,
+        "f1-score": 0.16666666666666669,
+        "support": 10.0
+      },
+      "weighted avg": {
+        "precision": 1.0,
+        "recall": 0.2,
+        "f1-score": 0.33333333333333337,
+        "support": 10.0
+      }
+    },
+    "tiers_evaluated": [
+      "sympy",
+      "llm"
+    ],
+    "misclassifications": {
+      "llm\u2192sympy": 8
+    }
+  },
+  "response_metrics": {
+    "sympy": {
+      "total_queries": 10,
+      "successful_queries": 10,
+      "accuracy": 0.2,
+      "avg_score": 0.2,
+      "score_distribution": {
+        "excellent": 2,
+        "good": 0,
+        "fair": 0,
+        "poor": 8
+      },
+      "sample_scores": [
+        {
+          "query": "derivative of x^3",
+          "score": 0,
+          "reason": "Empty response",
+          "expected": "3*x**2",
+          "actual": "None"
+        },
+        {
+          "query": "d/dx(sin(x))",
+          "score": 1,
+          "reason": "Answer contained in response",
+          "expected": "cos(x)",
+          "actual": "xcos(x) + sin(x)"
+        },
+        {
+          "query": "differentiate x^2 + 3x + 5",
+          "score": 0,
+          "reason": "Empty response",
+          "expected": "2*x + 3",
+          "actual": "None"
+        },
+        {
+          "query": "what is the derivative of e^x?",
+          "score": 0,
+          "reason": "Empty response",
+          "expected": "exp(x)",
+          "actual": "None"
+        },
+        {
+          "query": "find d/dx of cos(2x)",
+          "score": 0,
+          "reason": "Empty response",
+          "expected": "-2*sin(2*x)",
+          "actual": "None"
+        }
+      ]
+    }
+  },
+  "timing_metrics": {
+    "overall": {
+      "total_queries": 10,
+      "avg_time": 10.255258440971375,
+      "min_time": 0.0047991275787353516,
+      "max_time": 15.712860822677612,
+      "median_time": 12.644205093383789
+    },
+    "sympy": {
+      "count": 2,
+      "avg_time": 0.005675196647644043,
+      "min_time": 0.0047991275787353516,
+      "max_time": 0.006551265716552734
+    },
+    "llm": {
+      "count": 8,
+      "avg_time": 12.817654252052307,
+      "min_time": 9.790529012680054,
+      "max_time": 15.712860822677612
+    }
+  },
+  "dataset_stats": {
+    "total_queries": 130,
+    "tier_distribution": {
+      "sympy": 50,
+      "wolfram": 30,
+      "llm": 40,
+      "decline": 10
+    },
+    "category_distribution": {
+      "derivative": 15,
+      "integral": 15,
+      "algebra": 20,
+      "numerical": 15,
+      "symbolic": 11,
+      "conversion": 2,
+      "constant": 2,
+      "explanation": 20,
+      "proof": 10,
+      "word_problem": 10,
+      "out_of_domain": 10
+    },
+    "difficulty_distribution": {
+      "1": 20,
+      "2": 66,
+      "3": 30,
+      "4": 12,
+      "5": 2
+    }
+  },
+  "sample_queries": [
+    {
+      "query": "derivative of x^3",
+      "expected_tier": "sympy",
+      "predicted_tier": "llm",
+      "expected_output": "3*x**2",
+      "actual_output": null,
+      "category": "derivative",
+      "difficulty": 2,
+      "success": true,
+      "response_time": 15.712860822677612,
+      "cascade_path": [
+        "sympy",
+        "wolfram",
+        "llm"
+      ],
+      "error": null
+    },
+    {
+      "query": "d/dx(sin(x))",
+      "expected_tier": "sympy",
+      "predicted_tier": "sympy",
+      "expected_output": "cos(x)",
+      "actual_output": "xcos(x) + sin(x)",
+      "category": "derivative",
+      "difficulty": 2,
+      "success": true,
+      "response_time": 0.006551265716552734,
+      "cascade_path": [
+        "sympy"
+      ],
+      "error": null
+    },
+    {
+      "query": "differentiate x^2 + 3x + 5",
+      "expected_tier": "sympy",
+      "predicted_tier": "llm",
+      "expected_output": "2*x + 3",
+      "actual_output": null,
+      "category": "derivative",
+      "difficulty": 2,
+      "success": true,
+      "response_time": 12.436800956726074,
+      "cascade_path": [
+        "sympy",
+        "wolfram",
+        "llm"
+      ],
+      "error": null
+    },
+    {
+      "query": "what is the derivative of e^x?",
+      "expected_tier": "sympy",
+      "predicted_tier": "llm",
+      "expected_output": "exp(x)",
+      "actual_output": null,
+      "category": "derivative",
+      "difficulty": 2,
+      "success": true,
+      "response_time": 12.644205093383789,
+      "cascade_path": [
+        "sympy",
+        "wolfram",
+        "llm"
+      ],
+      "error": null
+    },
+    {
+      "query": "find d/dx of cos(2x)",
+      "expected_tier": "sympy",
+      "predicted_tier": "llm",
+      "expected_output": "-2*sin(2*x)",
+      "actual_output": null,
+      "category": "derivative",
+      "difficulty": 3,
+      "success": true,
+      "response_time": 12.678137302398682,
+      "cascade_path": [
+        "sympy",
+        "wolfram",
+        "llm"
+      ],
+      "error": null
+    },
+    {
+      "query": "derivative of x*sin(x)",
+      "expected_tier": "sympy",
+      "predicted_tier": "llm",
+      "expected_output": "x*cos(x) + sin(x)",
+      "actual_output": null,
+      "category": "derivative",
+      "difficulty": 3,
+      "success": true,
+      "response_time": 12.483037948608398,
+      "cascade_path": [
+        "sympy",
+        "wolfram",
+        "llm"
+      ],
+      "error": null
+    },
+    {
+      "query": "d/dx(ln(x))",
+      "expected_tier": "sympy",
+      "predicted_tier": "sympy",
+      "expected_output": "1/x",
+      "actual_output": "log(x) + 1",
+      "category": "derivative",
+      "difficulty": 2,
+      "success": true,
+      "response_time": 0.0047991275787353516,
+      "cascade_path": [
+        "sympy"
+      ],
+      "error": null
+    },
+    {
+      "query": "differentiate x^4 - 2x^2 + 1",
+      "expected_tier": "sympy",
+      "predicted_tier": "llm",
+      "expected_output": "4*x**3 - 4*x",
+      "actual_output": null,
+      "category": "derivative",
+      "difficulty": 2,
+      "success": true,
+      "response_time": 13.913760900497437,
+      "cascade_path": [
+        "sympy",
+        "wolfram",
+        "llm"
+      ],
+      "error": null
+    },
+    {
+      "query": "what is d/dx of tan(x)?",
+      "expected_tier": "sympy",
+      "predicted_tier": "llm",
+      "expected_output": "sec(x)**2",
+      "actual_output": null,
+      "category": "derivative",
+      "difficulty": 3,
+      "success": true,
+      "response_time": 12.881901979446411,
+      "cascade_path": [
+        "sympy",
+        "wolfram",
+        "llm"
+      ],
+      "error": null
+    },
+    {
+      "query": "derivative of x^n",
+      "expected_tier": "sympy",
+      "predicted_tier": "llm",
+      "expected_output": "n*x**(n-1)",
+      "actual_output": null,
+      "category": "derivative",
+      "difficulty": 2,
+      "success": true,
+      "response_time": 9.790529012680054,
+      "cascade_path": [
+        "sympy",
+        "wolfram",
+        "llm"
+      ],
+      "error": null
+    }
+  ]
+}
