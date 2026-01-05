@@ -47,31 +47,36 @@ class ClassifierEvaluator:
         # Calculate metrics
         accuracy = accuracy_score(y_true_idx, y_pred_idx)
 
-        # Per-tier metrics
+        # Find unique labels actually present in the data
+        unique_labels = sorted(set(y_true_idx + y_pred_idx))
+        unique_tier_names = [self.tier_names[i] for i in unique_labels]
+
+        # Per-tier metrics (only for classes that are present)
         precision, recall, f1, support = precision_recall_fscore_support(
-            y_true_idx, y_pred_idx, average=None, labels=range(len(self.tier_names))
+            y_true_idx, y_pred_idx, average=None, labels=unique_labels, zero_division=0
         )
 
         # Macro and weighted averages
         macro_precision, macro_recall, macro_f1, _ = precision_recall_fscore_support(
-            y_true_idx, y_pred_idx, average='macro'
+            y_true_idx, y_pred_idx, average='macro', zero_division=0
         )
 
         weighted_precision, weighted_recall, weighted_f1, _ = precision_recall_fscore_support(
-            y_true_idx, y_pred_idx, average='weighted'
+            y_true_idx, y_pred_idx, average='weighted', zero_division=0
         )
 
-        # Confusion matrix
-        cm = confusion_matrix(y_true_idx, y_pred_idx, labels=range(len(self.tier_names)))
+        # Confusion matrix (only for classes actually present)
+        cm = confusion_matrix(y_true_idx, y_pred_idx, labels=unique_labels)
 
-        # Per-tier metrics dict
+        # Per-tier metrics dict (only for classes that were evaluated)
         per_tier_metrics = {}
-        for idx, tier in enumerate(self.tier_names):
+        for i, idx in enumerate(unique_labels):
+            tier = self.tier_names[idx]
             per_tier_metrics[tier] = {
-                'precision': float(precision[idx]),
-                'recall': float(recall[idx]),
-                'f1': float(f1[idx]),
-                'support': int(support[idx])
+                'precision': float(precision[i]),
+                'recall': float(recall[i]),
+                'f1': float(f1[i]),
+                'support': int(support[i])
             }
 
         return {
@@ -86,9 +91,12 @@ class ClassifierEvaluator:
             'confusion_matrix': cm.tolist(),
             'classification_report': classification_report(
                 y_true_idx, y_pred_idx,
-                target_names=self.tier_names,
-                output_dict=True
-            )
+                labels=unique_labels,
+                target_names=unique_tier_names,
+                output_dict=True,
+                zero_division=0
+            ),
+            'tiers_evaluated': unique_tier_names
         }
 
     def print_metrics(self, metrics: Dict[str, Any]):
@@ -105,7 +113,8 @@ class ClassifierEvaluator:
         print(f"{'Tier':<12} {'Precision':<12} {'Recall':<12} {'F1-Score':<12} {'Support':<12}")
         print("-"*70)
 
-        for tier in self.tier_names:
+        # Only print metrics for tiers that were evaluated
+        for tier in metrics.get('tiers_evaluated', self.tier_names):
             m = metrics['per_tier_metrics'][tier]
             print(f"{tier:<12} {m['precision']:<12.3f} {m['recall']:<12.3f} "
                   f"{m['f1']:<12.3f} {m['support']:<12}")
@@ -127,10 +136,13 @@ class ClassifierEvaluator:
         """
         cm = np.array(metrics['confusion_matrix'])
 
+        # Use only the tiers that were evaluated
+        tier_labels = metrics.get('tiers_evaluated', self.tier_names)
+
         plt.figure(figsize=(10, 8))
         sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
-                    xticklabels=self.tier_names,
-                    yticklabels=self.tier_names)
+                    xticklabels=tier_labels,
+                    yticklabels=tier_labels)
         plt.xlabel('Predicted Tier', fontsize=12)
         plt.ylabel('Actual Tier', fontsize=12)
         plt.title('Query Classifier Confusion Matrix', fontsize=14, fontweight='bold')
