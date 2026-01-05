@@ -411,21 +411,45 @@ class QueryTranslator:
 
         # Pattern: single letter/digit followed by opening paren → implicit multiplication
         # BUT preserve known function names (sin, cos, tan, log, etc.)
-        known_functions = r'(?:sin|cos|tan|sec|csc|cot|asin|acos|atan|' \
-                         r'sinh|cosh|tanh|log|ln|exp|sqrt|abs|' \
-                         r'diff|integrate|limit|solve|factor|expand|simplify)'
+        known_functions = ['sin', 'cos', 'tan', 'sec', 'csc', 'cot',
+                          'asin', 'acos', 'atan', 'sinh', 'cosh', 'tanh',
+                          'log', 'ln', 'exp', 'sqrt', 'abs',
+                          'diff', 'integrate', 'limit', 'solve', 'factor', 'expand', 'simplify']
 
-        # Only add * if NOT preceded by a known function name
-        # Match: single letter or digit followed by (, but not if it's part of a function name
-        def add_multiplication(match):
-            """Helper to selectively add multiplication."""
-            char = match.group(1)
-            # If it's a single character (not part of a longer word), add *
-            return f"{char}*("
+        # Create a regex pattern that matches function names followed by '('
+        func_pattern = r'\b(?:' + '|'.join(known_functions) + r')\('
 
-        # Only apply to single characters followed by (
-        # This preserves "cos(" but converts "x(" to "x*("
-        expr = re.sub(rf'(?<!{known_functions})(\b\w)\(', add_multiplication, expr)
+        # Find all function calls to preserve them
+        func_positions = set()
+        for match in re.finditer(func_pattern, expr):
+            func_positions.add(match.start())
+
+        # Now add multiplication for single chars followed by ( that aren't function calls
+        result = []
+        i = 0
+        while i < len(expr):
+            # Check if this position is the start of a function call
+            if i in func_positions:
+                # Find the matching function and add it as-is
+                for func in known_functions:
+                    if expr[i:i+len(func)+1] == func + '(':
+                        result.append(expr[i:i+len(func)+1])
+                        i += len(func) + 1
+                        break
+            # Check for single char followed by (
+            elif i < len(expr) - 1 and expr[i].isalnum() and expr[i+1] == '(':
+                # Check if the char before is not alphanumeric (to ensure it's a single char)
+                if i == 0 or not expr[i-1].isalnum():
+                    result.append(expr[i] + '*(')
+                    i += 2
+                else:
+                    result.append(expr[i])
+                    i += 1
+            else:
+                result.append(expr[i])
+                i += 1
+
+        expr = ''.join(result)
 
         return expr
 
