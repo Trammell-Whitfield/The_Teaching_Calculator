@@ -267,22 +267,24 @@ class EvaluationRunner:
                 if tier in ['sympy', 'wolfram']:
                     # Computational scoring (0 or 1)
                     score, reason = self.response_scorer.score_computational(
-                        result['actual_output'],
+                        result['actual_output'] or '',
                         result['expected_output']
                     )
                     scores.append(score)
+                    actual_str = result['actual_output'] or ''
                     score_details.append({
                         'query': result['query'],
                         'score': score,
                         'reason': reason,
                         'expected': result['expected_output'],
-                        'actual': result['actual_output'][:100]
+                        'actual': actual_str[:100] if actual_str else 'None'
                     })
 
                 elif tier == 'llm':
                     # Explanatory scoring (0-3)
+                    actual_output = result['actual_output'] or ''
                     score, reason = self.response_scorer.score_explanatory(
-                        result['actual_output']
+                        actual_output
                     )
                     # Normalize to 0-1 for comparison
                     normalized_score = score / 3.0
@@ -292,7 +294,7 @@ class EvaluationRunner:
                         'score': score,
                         'normalized_score': normalized_score,
                         'reason': reason,
-                        'response_length': len(result['actual_output'])
+                        'response_length': len(actual_output)
                     })
 
             # Calculate metrics
