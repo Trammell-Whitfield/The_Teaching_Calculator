@@ -1,0 +1,149 @@
+{
+  "classifier_metrics": {
+    "accuracy": 0.2,
+    "macro_precision": 0.5,
+    "macro_recall": 0.1,
+    "macro_f1": 0.16666666666666669,
+    "weighted_precision": 1.0,
+    "weighted_recall": 0.2,
+    "weighted_f1": 0.33333333333333337,
+    "per_tier_metrics": {
+      "sympy": {
+        "precision": 1.0,
+        "recall": 0.2,
+        "f1": 0.33333333333333337,
+        "support": 10
+      },
+      "llm": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 0
+      }
+    },
+    "confusion_matrix": [
+      [
+        2,
+        8
+      ],
+      [
+        0,
+        0
+      ]
+    ],
+    "classification_report": {
+      "sympy": {
+        "precision": 1.0,
+        "recall": 0.2,
+        "f1-score": 0.33333333333333337,
+        "support": 10.0
+      },
+      "llm": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1-score": 0.0,
+        "support": 0.0
+      },
+      "accuracy": 0.2,
+      "macro avg": {
+        "precision": 0.5,
+        "recall": 0.1,
+        "f1-score": 0.16666666666666669,
+        "support": 10.0
+      },
+      "weighted avg": {
+        "precision": 1.0,
+        "recall": 0.2,
+        "f1-score": 0.33333333333333337,
+        "support": 10.0
+      }
+    },
+    "tiers_evaluated": [
+      "sympy",
+      "llm"
+    ],
+    "misclassifications": {
+      "llm\u2192sympy": 8
+    }
+  },
+  "response_metrics": {
+    "sympy": {
+      "total_queries": 10,
+      "successful_queries": 10,
+      "accuracy": 0.2,
+      "avg_score": 0.2,
+      "score_distribution": {
+        "excellent": 2,
+        "good": 0,
+        "fair": 0,
+        "poor": 8
+      },
+      "sample_scores": [
+        {
+          "query": "derivative of x^3",
+          "score": 0,
+          "reason": "Empty response",
+          "expected": "3*x**2",
+          "actual": "None"
+        },
+        {
+          "query": "d/dx(sin(x))",
+          "score": 1,
+          "reason": "Answer contained in response",
+          "expected": "cos(x)",
+          "actual": "xcos(x) + sin(x)"
+        },
+        {
+          "query": "differentiate x^2 + 3x + 5",
+          "score": 0,
+          "reason": "Empty response",
+          "expected": "2*x + 3",
+          "actual": "None"
+        },
+        {
+          "query": "what is the derivative of e^x?",
+          "score": 0,
+          "reason": "Empty response",
+          "expected": "exp(x)",
+          "actual": "None"
+        },
+        {
+          "query": "find d/dx of cos(2x)",
+          "score": 0,
+          "reason": "Empty response",
+          "expected": "-2*sin(2*x)",
+          "actual": "None"
+        }
+      ]
+    }
+  },
+  "dataset_stats": {
+    "total_queries": 130,
+    "tier_distribution": {
+      "sympy": 50,
+      "wolfram": 30,
+      "llm": 40,
+      "decline": 10
+    },
+    "category_distribution": {
+      "derivative": 15,
+      "integral": 15,
+      "algebra": 20,
+      "numerical": 15,
+      "symbolic": 11,
+      "conversion": 2,
+      "constant": 2,
+      "explanation": 20,
+      "proof": 10,
+      "word_problem": 10,
+      "out_of_domain": 10
+    },
+    "difficulty_distribution": {
+      "1": 20,
+      "2": 66,
+      "3": 30,
+      "4": 12,
+      "5": 2
+    }
+  }
+}
