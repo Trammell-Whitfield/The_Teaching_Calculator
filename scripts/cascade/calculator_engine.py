@@ -1,18 +1,14 @@
 #!/usr/bin/env python3
 """
-Calculator Engine - Phase 7: Cascade Orchestrator
-Main orchestration logic for the Holy Calculator's 3-layer cascade system.
+Calculator Engine - Cascade Orchestrator
 
-Architecture:
-    Layer 1 (SymPy): Fast offline symbolic math (40-50% coverage)
-    Layer 2 (Wolfram): Online API for intermediate complexity (30-40% coverage)
-    Layer 3 (LLM): Deep reasoning fallback (handles remaining 10-30%)
+Main orchestration logic for the 3-layer cascade system:
+- Layer 1 (SymPy): Fast offline symbolic math
+- Layer 2 (Wolfram): Online API for complex queries
+- Layer 3 (LLM): Deep reasoning and explanations
 
-Strategy:
-    1. Route query to most appropriate layer first
-    2. If layer fails, cascade to next layer
-    3. Return first successful result
-    4. Track statistics and performance
+Automatically routes queries to the most appropriate layer and
+cascades to fallback layers if needed.
 """
 
 import time
@@ -62,39 +58,25 @@ class MathQueryRouter:
         self.logger = logging.getLogger(__name__)
 
     def route_query(self, query: str) -> Dict[str, Any]:
-        """
-        Route a mathematical query to the most appropriate engine.
-
-        Args:
-            query: User's mathematical query
-
-        Returns:
-            Dictionary with routing decision:
-            {
-                'primary': 'sympy' | 'wolfram' | 'llm',
-                'fallback_order': ['layer2', 'layer3'],
-                'confidence': 0.0-1.0,
-                'reasoning': 'explanation'
-            }
-        """
+        """Route a query to the most appropriate computational layer."""
         query_lower = query.lower()
 
-        # Proof/explanation requests → LLM
+        # Proofs and explanations go to LLM
         if any(kw in query_lower for kw in ['prove', 'proof', 'explain', 'why', 'show that']):
             return {
                 'primary': 'llm',
-                'fallback_order': [],  # LLM is final layer, no fallback
+                'fallback_order': [],
                 'confidence': 0.95,
-                'reasoning': 'Requires explanation or proof (LLM strength)'
+                'reasoning': 'Requires explanation or proof'
             }
 
-        # Word problem detection → LLM
+        # Word problems go to LLM
         if self._is_word_problem(query):
             return {
                 'primary': 'llm',
                 'fallback_order': [],
                 'confidence': 0.9,
-                'reasoning': 'Detected word problem structure'
+                'reasoning': 'Word problem detected'
             }
 
         # Check keyword matches

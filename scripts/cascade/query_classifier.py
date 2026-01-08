@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-Enhanced Query Classifier with Difficulty Assessment
-Classifies mathematical queries by type AND difficulty level.
+Query Classifier - Analyzes mathematical queries by type and difficulty.
 """
 
 import re

@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 """
-Query Translation Layer for Holy Calculator
-Converts natural language math queries to standardized symbolic formats.
+Query Translator - Converts natural language to standardized math formats.
 
-This module addresses the critical issue where queries like "derivative of x^2"
-were being parsed literally as "d*e*r*i*v*a*t*i*v*e*o*f*x^2" instead of being
-recognized as calculus operations.
+Translates queries like "derivative of x^2" into SymPy-compatible expressions.
 """
 
 import re

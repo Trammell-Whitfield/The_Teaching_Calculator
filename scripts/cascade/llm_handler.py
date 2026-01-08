@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """
-LLM Handler - Layer 3 of the Holy Calculator Cascade
-Handles complex reasoning and word problems using Qwen2.5-Math-7B-Instruct (Phase 7.5)
+LLM Handler - Layer 3 fallback using Qwen2.5-Math-7B-Instruct.
 
-This is the final fallback layer for queries that SymPy and Wolfram cannot handle.
-Upgraded from DeepSeek-Math to Qwen2.5-Math for superior mathematical reasoning.
+Handles complex reasoning, word problems, and explanations that
+require deep mathematical understanding.
 """
 
 import subprocess
@@ -21,29 +20,13 @@ from platform_config import PlatformConfig
 
 class LLMHandler:
     """
-    Handles mathematical queries using Qwen2.5-Math-7B-Instruct LLM via llama.cpp.
+    Handles mathematical queries using Qwen2.5-Math-7B-Instruct via llama.cpp.
 
-    Phase 7.5 Upgrade: Switched from DeepSeek-Math to Qwen2.5-Math
-    - 83.6% accuracy on MATH benchmark (vs DeepSeek's ~55%)
-    - 91.6% accuracy on GSM8K benchmark (vs DeepSeek's ~82%)
-    - State-of-the-art 7B mathematical reasoning model
-
-    Capabilities:
-    - Mathematical reasoning and proofs
-    - Word problems requiring interpretation
-    - Multi-step problem solving
-    - Conceptual explanations
-    - Problems that require context understanding
+    Specializes in reasoning, proofs, word problems, and multi-step solutions.
     """
 
     def __init__(self, model_path: Optional[str] = None, llama_cpp_path: Optional[str] = None):
-        """
-        Initialize the LLM handler.
-
-        Args:
-            model_path: Path to GGUF model file (auto-detects if None)
-            llama_cpp_path: Path to llama-cli binary (auto-detects if None)
-        """
+        """Initialize the LLM handler with model and binary paths."""
         # Detect platform and get optimized configuration
         self.platform_config = PlatformConfig()
 

@@ -55,13 +55,12 @@ def get_default_model() -> str:
     """Find the best available quantized model."""
     quantized_dir = Path(__file__).parent / 'models' / 'quantized'
 
-    # Phase 7.5: Prefer Qwen2.5-Math (superior model), fallback to DeepSeek
-    # Q5_K_M preferred for quality on 16GB Raspberry Pi 5 (5.1GB model, ~7.6GB total RAM)
-    # Q4_K_M fallback for 8GB systems or speed priority (4.4GB model, ~6.9GB total RAM)
+    # Priority: Qwen2.5-Math > DeepSeek-Math
+    # Q5_K_M for 16GB RAM systems, Q4_K_M for 8GB RAM
     preferred_models = [
-        'qwen2.5-math-7b-instruct-q5km.gguf',  # Phase 7.5: Best quality (16GB RAM)
-        'qwen2.5-math-7b-instruct-q4km.gguf',  # Phase 7.5: Faster (8GB+ RAM)
-        'deepseek-math-7b-q5km.gguf',          # Original model (fallback)
+        'qwen2.5-math-7b-instruct-q5km.gguf',
+        'qwen2.5-math-7b-instruct-q4km.gguf',
+        'deepseek-math-7b-q5km.gguf',
         'deepseek-math-7b-q4km.gguf',
     ]
 
@@ -70,7 +69,6 @@ def get_default_model() -> str:
         if model_path.exists():
             return str(model_path)
 
-    # If no preferred models found, return the default path (will fail validation later)
     return str(quantized_dir / 'qwen2.5-math-7b-instruct-q5km.gguf')
 
 
@@ -173,7 +171,7 @@ Examples:
     if args.query:
         logger.info("Processing query...")
         result = engine.solve(args.query)
-        _print_result(result, logger)
+        _print_result(result)
 
         # Show statistics if verbose
         if args.verbose:
@@ -182,7 +180,7 @@ Examples:
         return 0 if result['success'] else 1
 
 
-def _print_result(result: dict, logger: logging.Logger):
+def _print_result(result: dict):
     """Print query result in a user-friendly format."""
     print("\n" + "=" * 70)
 
@@ -217,7 +215,7 @@ def _layer_to_num(layer: str) -> str:
     return mapping.get(layer, layer)
 
 
-def _run_test_suite(engine, logger):
+def _run_test_suite(engine, logger=None):
     """Run a quick test suite."""
     test_queries = [
         ("Solve for x: 2x + 5 = 13", "sympy"),
@@ -257,7 +255,7 @@ def _run_test_suite(engine, logger):
     engine.print_stats()
 
 
-def _run_interactive_mode(engine, logger):
+def _run_interactive_mode(engine, logger=None):
     """Run interactive REPL mode."""
     print("\n" + "=" * 70)
     print("HOLY CALCULATOR - INTERACTIVE MODE")
