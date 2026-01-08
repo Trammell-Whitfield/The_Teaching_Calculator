@@ -111,6 +111,9 @@ test_*.py
 # Cache directory (runtime only, not for git)
 cache/
 
+# Historic/archive files
+Historic/
+
 # Evaluation and testing results
 eval_results_demo/
 eval_test_sample/
@@ -126,3 +129,5 @@ eval_test_sample/
 detailed_results.json
 evaluation_metrics.json
 evaluation_report.txt
+ 
+old_LLM_prototype.py/
