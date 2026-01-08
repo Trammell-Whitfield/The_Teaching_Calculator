@@ -119,6 +119,9 @@ eval_test_sample/
 *.jpeg
 *.svg
 
+# Keep important images for documentation
+!POWER_MEASUREMENT.svg
+
 # Specific result files
 detailed_results.json
 evaluation_metrics.json
