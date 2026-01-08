@@ -87,19 +87,21 @@ pi-stats-app/*.local
 *.swp
 
 # ============================================================================
-# Documentation & Guides (Keep local, don't push to repo or deploy to Pi)
+# Documentation & Guides
 # ============================================================================
 
-# All markdown files
+# All markdown files EXCEPT main documentation
 *.md
 
-# All text files
-*.txt
+# Keep important documentation files
+!README.md
+!TECHNICAL_SPECS.md
+!SETUP.md
+!LICENSE.md
 
-# Specific exceptions (uncomment if you want to include these)
-# !README.md
-# !CONTRIBUTING.md
-# !LICENSE.md
+# All text files except requirements
+*.txt
+!requirements.txt
 
 # Development/testing documentation
 model_comparison_*.json
