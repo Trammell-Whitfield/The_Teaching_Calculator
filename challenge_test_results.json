@@ -1,0 +1,683 @@
+{
+  "timestamp": "2026-01-06T22:17:25.814918",
+  "test_type": "challenge",
+  "overall": {
+    "total_queries": 75,
+    "correct": 51,
+    "accuracy": 0.68,
+    "total_time": 0.9608786106109619,
+    "avg_time_per_query": 0.01281171480814616
+  },
+  "by_category": {
+    "harder_derivatives": {
+      "total": 15,
+      "correct": 15,
+      "incorrect": 0,
+      "failed": 0,
+      "avg_time": 0.006646251678466797,
+      "min_time": 0.0013117790222167969,
+      "max_time": 0.04086804389953613,
+      "queries": [
+        {
+          "query": "derivative of (2x + 1)^5",
+          "expected": "10(2x+1)^4",
+          "actual": "10*(2*x + 1)^4",
+          "correct": true,
+          "time": 0.04086804389953613,
+          "difficulty": 3
+        },
+        {
+          "query": "d/dx(e^(x^2))",
+          "expected": "2x*e^(x^2)",
+          "actual": "2*x*e^(x^2)",
+          "correct": true,
+          "time": 0.003742694854736328,
+          "difficulty": 3
+        },
+        {
+          "query": "differentiate sqrt(x^2 + 1)",
+          "expected": "x/sqrt(x^2+1)",
+          "actual": "x/sqrt(x^2 + 1)",
+          "correct": true,
+          "time": 0.003820180892944336,
+          "difficulty": 3
+        },
+        {
+          "query": "derivative of ln(x^2 + 1)",
+          "expected": "2x/(x^2+1)",
+          "actual": "2*x/(x^2 + 1)",
+          "correct": true,
+          "time": 0.0013117790222167969,
+          "difficulty": 3
+        },
+        {
+          "query": "d/dx(x^2 * e^x)",
+          "expected": "x^2*e^x + 2x*e^x",
+          "actual": "x^2*e^(x) + 2*x*e^(x)",
+          "correct": true,
+          "time": 0.002810239791870117,
+          "difficulty": 3
+        },
+        {
+          "query": "derivative of x^3 * ln(x)",
+          "expected": "3x^2*ln(x) + x^2",
+          "actual": "3*x^2*ln(x) + x^2",
+          "correct": true,
+          "time": 0.0022194385528564453,
+          "difficulty": 3
+        },
+        {
+          "query": "derivative of x/sin(x)",
+          "expected": "(sin(x)-x*cos(x))/sin^2(x)",
+          "actual": "-x*cos(x)/sin(x)^2 + 1/sin(x)",
+          "correct": true,
+          "time": 0.007384777069091797,
+          "difficulty": 4
+        },
+        {
+          "query": "d/dx(1/(x^2+1))",
+          "expected": "-2x/(x^2+1)^2",
+          "actual": "-2*x/(x^2 + 1)^2",
+          "correct": true,
+          "time": 0.0029926300048828125,
+          "difficulty": 3
+        },
+        {
+          "query": "differentiate sin(2x) * cos(x)",
+          "expected": "2cos(2x)cos(x) - sin(2x)sin(x)",
+          "actual": "-sin(x)*sin(2*x) + 2*cos(x)*cos(2*x)",
+          "correct": true,
+          "time": 0.007861137390136719,
+          "difficulty": 4
+        },
+        {
+          "query": "derivative of tan^2(x)",
+          "expected": "2tan(x)sec^2(x)",
+          "actual": "(2*tan(x)^2 + 2)*tan(x)",
+          "correct": true,
+          "time": 0.008409738540649414,
+          "difficulty": 4
+        },
+        {
+          "query": "d/dx(x^x)",
+          "expected": "x^x(ln(x)+1)",
+          "actual": "x^x*(ln(x) + 1)",
+          "correct": true,
+          "time": 0.0031518936157226562,
+          "difficulty": 4
+        },
+        {
+          "query": "derivative of e^x * x^e",
+          "expected": "e^x*x^e + e*e^x*x^(e-1)",
+          "actual": "x^E*e^(x) + E*x^E*e^(x)/x",
+          "correct": true,
+          "time": 0.005983114242553711,
+          "difficulty": 4
+        },
+        {
+          "query": "derivative of arcsin(x)",
+          "expected": "1/sqrt(1-x^2)",
+          "actual": "1/sqrt(1 - x^2)",
+          "correct": true,
+          "time": 0.003679037094116211,
+          "difficulty": 3
+        },
+        {
+          "query": "d/dx(arctan(x))",
+          "expected": "1/(1+x^2)",
+          "actual": "1/(x^2 + 1)",
+          "correct": true,
+          "time": 0.002116680145263672,
+          "difficulty": 3
+        },
+        {
+          "query": "derivative of ln(ln(x))",
+          "expected": "1/(x*ln(x))",
+          "actual": "1/(x*ln(x))",
+          "correct": true,
+          "time": 0.0033423900604248047,
+          "difficulty": 4
+        }
+      ],
+      "accuracy": 1.0
+    },
+    "harder_integrals": {
+      "total": 15,
+      "correct": 13,
+      "incorrect": 2,
+      "failed": 0,
+      "avg_time": 0.028673744201660155,
+      "min_time": 0.002486705780029297,
+      "max_time": 0.09169411659240723,
+      "queries": [
+        {
+          "query": "integrate x * e^x",
+          "expected": "x*e^x - e^x",
+          "actual": "(x - 1)*e^(x) + C",
+          "correct": true,
+          "time": 0.061980485916137695,
+          "difficulty": 3
+        },
+        {
+          "query": "integral of x^2 * sin(x)",
+          "expected": "-x^2*cos(x) + 2x*sin(x) + 2cos(x)",
+          "actual": "-x^2*cos(x) + 2*x*sin(x) + 2*cos(x) + C",
+          "correct": true,
+          "time": 0.09169411659240723,
+          "difficulty": 4
+        },
+        {
+          "query": "integrate 1/sqrt(x)",
+          "expected": "2*sqrt(x)",
+          "actual": "2*sqrt(x) + C",
+          "correct": true,
+          "time": 0.002486705780029297,
+          "difficulty": 2
+        },
+        {
+          "query": "integral of x * sqrt(x^2 + 1)",
+          "expected": "(x^2+1)^(3/2)/3",
+          "actual": "x^2*sqrt(x^2 + 1)/3 + sqrt(x^2 + 1)/3 + C",
+          "correct": true,
+          "time": 0.050304412841796875,
+          "difficulty": 4
+        },
+        {
+          "query": "integrate 2x/(x^2 + 1)",
+          "expected": "ln(x^2+1)",
+          "actual": "ln(x^2 + 1) + C",
+          "correct": true,
+          "time": 0.015519857406616211,
+          "difficulty": 3
+        },
+        {
+          "query": "integral of sin^2(x)",
+          "expected": "(x - sin(x)cos(x))/2",
+          "actual": "x/2 - sin(x)*cos(x)/2 + C",
+          "correct": true,
+          "time": 0.0036416053771972656,
+          "difficulty": 3
+        },
+        {
+          "query": "integrate cos^2(x)",
+          "expected": "(x + sin(x)cos(x))/2",
+          "actual": "x/2 + sin(x)*cos(x)/2 + C",
+          "correct": true,
+          "time": 0.002759218215942383,
+          "difficulty": 3
+        },
+        {
+          "query": "integral of sec^2(x)",
+          "expected": "tan(x)",
+          "actual": "sin(x)/cos(x) + C",
+          "correct": true,
+          "time": 0.0027091503143310547,
+          "difficulty": 2
+        },
+        {
+          "query": "integrate x * e^(x^2)",
+          "expected": "e^(x^2)/2",
+          "actual": "e^(x^2)/2 + C",
+          "correct": true,
+          "time": 0.01812434196472168,
+          "difficulty": 3
+        },
+        {
+          "query": "integral of e^x * sin(x)",
+          "expected": "e^x(sin(x)-cos(x))/2",
+          "actual": "e^(x)*sin(x)/2 - e^(x)*cos(x)/2 + C",
+          "correct": true,
+          "time": 0.07039523124694824,
+          "difficulty": 4
+        },
+        {
+          "query": "integrate 1/(x^2 - 1)",
+          "expected": "ln|x-1| - ln|x+1|/2",
+          "actual": "ln(x - 1)/2 - ln(x + 1)/2 + C",
+          "correct": false,
+          "time": 0.024709701538085938,
+          "difficulty": 4
+        },
+        {
+          "query": "integral of x/(x^2 + 4)",
+          "expected": "ln(x^2+4)/2",
+          "actual": "ln(x^2 + 4)/2 + C",
+          "correct": true,
+          "time": 0.014575958251953125,
+          "difficulty": 3
+        },
+        {
+          "query": "integrate ln(x)",
+          "expected": "x*ln(x) - x",
+          "actual": "x*ln(x) - x + C",
+          "correct": true,
+          "time": 0.016607999801635742,
+          "difficulty": 3
+        },
+        {
+          "query": "integral of 1/(x*ln(x))",
+          "expected": "ln(ln(x))",
+          "actual": "ln(ln(x)) + C",
+          "correct": true,
+          "time": 0.02406454086303711,
+          "difficulty": 4
+        },
+        {
+          "query": "integrate sqrt(1 - x^2)",
+          "expected": "arcsin(x)/2 + x*sqrt(1-x^2)/2",
+          "actual": "x*sqrt(1 - x^2)/2 + asin(x)/2 + C",
+          "correct": false,
+          "time": 0.0305328369140625,
+          "difficulty": 5
+        }
+      ],
+      "accuracy": 0.8666666666666667
+    },
+    "complex_algebra": {
+      "total": 16,
+      "correct": 8,
+      "incorrect": 6,
+      "failed": 2,
+      "avg_time": 0.013907164335250854,
+      "min_time": 0.00183868408203125,
+      "max_time": 0.04222536087036133,
+      "queries": [
+        {
+          "query": "solve x^2 + y^2 = 25 and x + y = 7",
+          "expected": "x=3,y=4 or x=4,y=3",
+          "actual": "[(4, 3), (3, 4)]",
+          "correct": false,
+          "time": 0.012836933135986328,
+          "difficulty": 4
+        },
+        {
+          "query": "solve x^2 + 4x + 13 = 0",
+          "expected": "x = -2 \u00b1 3i",
+          "actual": "x = -2 - 3i, x = -2 + 3i",
+          "correct": false,
+          "time": 0.017730712890625,
+          "difficulty": 3
+        },
+        {
+          "query": "solve x^2 + 2x + 5 = 0",
+          "expected": "x = -1 \u00b1 2i",
+          "actual": "x = -1 - 2i, x = -1 + 2i",
+          "correct": false,
+          "time": 0.015975475311279297,
+          "difficulty": 3
+        },
+        {
+          "query": "solve x^3 - 8 = 0",
+          "expected": "x = 2, complex roots",
+          "actual": "x = 2, x = -1 - sqrt(3)i, x = -1 + sqrt(3)i",
+          "correct": false,
+          "time": 0.012439966201782227,
+          "difficulty": 3
+        },
+        {
+          "query": "find roots of x^4 - 16 = 0",
+          "expected": "x = \u00b12, \u00b12i",
+          "actual": null,
+          "correct": false,
+          "time": 0.0018858909606933594,
+          "difficulty": 4,
+          "failed": true
+        },
+        {
+          "query": "solve 3x + 2y = 12 and 2x - y = 1",
+          "expected": "x=2, y=3",
+          "actual": "x = 2, y = 3",
+          "correct": true,
+          "time": 0.009978055953979492,
+          "difficulty": 3
+        },
+        {
+          "query": "solve x + 2y + 3z = 14 and 2x + y + z = 8 and x - y + z = 2",
+          "expected": "x=1,y=2,z=3",
+          "actual": "x = 14/9, y = 20/9, z = 8/3",
+          "correct": false,
+          "time": 0.011630773544311523,
+          "difficulty": 4
+        },
+        {
+          "query": "solve 1/x + 1/(x+1) = 1",
+          "expected": "x = (-1\u00b1sqrt(5))/2",
+          "actual": "x = 1/2 - sqrt(5)/2, x = 1/2 + sqrt(5)/2",
+          "correct": false,
+          "time": 0.02426743507385254,
+          "difficulty": 4
+        },
+        {
+          "query": "solve x/(x-1) = 2",
+          "expected": "x = 2",
+          "actual": "x = 2",
+          "correct": true,
+          "time": 0.005692720413208008,
+          "difficulty": 3
+        },
+        {
+          "query": "solve 2^x = 16",
+          "expected": "x = 4",
+          "actual": "x = 4",
+          "correct": true,
+          "time": 0.04222536087036133,
+          "difficulty": 2
+        },
+        {
+          "query": "solve ln(x) = 2",
+          "expected": "x = e^2",
+          "actual": "x = e^(2)",
+          "correct": true,
+          "time": 0.032697439193725586,
+          "difficulty": 2
+        },
+        {
+          "query": "solve e^(2x) = 7",
+          "expected": "x = ln(7)/2",
+          "actual": "x = ln(7)/2 + i*pi, x = ln(7)/2",
+          "correct": true,
+          "time": 0.025875568389892578,
+          "difficulty": 3
+        },
+        {
+          "query": "solve x^2 - 5x + 6 > 0",
+          "expected": "x < 2 or x > 3",
+          "actual": null,
+          "correct": false,
+          "time": 0.0021915435791015625,
+          "difficulty": 4,
+          "failed": true
+        },
+        {
+          "query": "factor x^4 + 4",
+          "expected": "(x^2-2x+2)(x^2+2x+2)",
+          "actual": "(x^2 - 2*x + 2)*(x^2 + 2*x + 2)",
+          "correct": true,
+          "time": 0.002833127975463867,
+          "difficulty": 4
+        },
+        {
+          "query": "factor x^3 + 27",
+          "expected": "(x+3)(x^2-3x+9)",
+          "actual": "(x + 3)*(x^2 - 3*x + 9)",
+          "correct": true,
+          "time": 0.0024149417877197266,
+          "difficulty": 3
+        },
+        {
+          "query": "expand (x+y)^4",
+          "expected": "x^4+4x^3y+6x^2y^2+4xy^3+y^4",
+          "actual": "x^4 + 4*x^3*y + 6*x^2*y^2 + 4*x*y^3 + y^4",
+          "correct": true,
+          "time": 0.00183868408203125,
+          "difficulty": 3
+        }
+      ],
+      "accuracy": 0.5
+    },
+    "advanced_numerical": {
+      "total": 14,
+      "correct": 5,
+      "incorrect": 3,
+      "failed": 6,
+      "avg_time": 0.0007842608860560826,
+      "min_time": 1.6927719116210938e-05,
+      "max_time": 0.002340555191040039,
+      "queries": [
+        {
+          "query": "what is 10 choose 3",
+          "expected": "120",
+          "actual": "120",
+          "correct": true,
+          "time": 0.0008697509765625,
+          "difficulty": 2
+        },
+        {
+          "query": "calculate 52 choose 5",
+          "expected": "2598960",
+          "actual": null,
+          "correct": false,
+          "time": 2.86102294921875e-05,
+          "difficulty": 3,
+          "failed": true
+        },
+        {
+          "query": "what is 8!",
+          "expected": "40320",
+          "actual": "40320",
+          "correct": true,
+          "time": 0.0005412101745605469,
+          "difficulty": 2
+        },
+        {
+          "query": "calculate 10!",
+          "expected": "3628800",
+          "actual": null,
+          "correct": false,
+          "time": 1.6927719116210938e-05,
+          "difficulty": 2,
+          "failed": true
+        },
+        {
+          "query": "what is 2^20",
+          "expected": "1048576",
+          "actual": "1048576",
+          "correct": true,
+          "time": 0.0004894733428955078,
+          "difficulty": 2
+        },
+        {
+          "query": "calculate sqrt(17689)",
+          "expected": "133",
+          "actual": null,
+          "correct": false,
+          "time": 1.7642974853515625e-05,
+          "difficulty": 2,
+          "failed": true
+        },
+        {
+          "query": "what is the cube root of 27",
+          "expected": "3",
+          "actual": null,
+          "correct": false,
+          "time": 0.001138448715209961,
+          "difficulty": 1,
+          "failed": true
+        },
+        {
+          "query": "what is 100 mod 7",
+          "expected": "2",
+          "actual": "2",
+          "correct": true,
+          "time": 0.0006992816925048828,
+          "difficulty": 2
+        },
+        {
+          "query": "calculate 13^17 mod 19",
+          "expected": "requires computation",
+          "actual": "8.65041591938134e+18*a^2*c^2*e*l^2*t*u",
+          "correct": false,
+          "time": 0.002340555191040039,
+          "difficulty": 4
+        },
+        {
+          "query": "gcd of 144 and 60",
+          "expected": "12",
+          "actual": "12",
+          "correct": true,
+          "time": 0.0009605884552001953,
+          "difficulty": 2
+        },
+        {
+          "query": "lcm of 12, 18, and 24",
+          "expected": "72",
+          "actual": "36",
+          "correct": false,
+          "time": 0.0008671283721923828,
+          "difficulty": 2
+        },
+        {
+          "query": "prime factors of 360",
+          "expected": "2^3 * 3^2 * 5",
+          "actual": null,
+          "correct": false,
+          "time": 0.00015926361083984375,
+          "difficulty": 3,
+          "failed": true
+        },
+        {
+          "query": "what is (3 + 4i) * (2 - i)",
+          "expected": "10 + 5i",
+          "actual": "(2.0 - i)*(4.0*i + 3.0)",
+          "correct": false,
+          "time": 0.0018918514251708984,
+          "difficulty": 3
+        },
+        {
+          "query": "calculate |3 + 4i|",
+          "expected": "5",
+          "actual": null,
+          "correct": false,
+          "time": 0.0009589195251464844,
+          "difficulty": 2,
+          "failed": true
+        }
+      ],
+      "accuracy": 0.35714285714285715
+    },
+    "symbolic_manipulation": {
+      "total": 15,
+      "correct": 10,
+      "incorrect": 3,
+      "failed": 2,
+      "avg_time": 0.013172292709350586,
+      "min_time": 3.123283386230469e-05,
+      "max_time": 0.03453183174133301,
+      "queries": [
+        {
+          "query": "simplify sin^2(x) + cos^2(x)",
+          "expected": "1",
+          "actual": "1",
+          "correct": true,
+          "time": 0.018100976943969727,
+          "difficulty": 2
+        },
+        {
+          "query": "simplify 1 - sin^2(x)",
+          "expected": "cos^2(x)",
+          "actual": "cos(x)^2",
+          "correct": true,
+          "time": 0.02089095115661621,
+          "difficulty": 2
+        },
+        {
+          "query": "expand sin(2x)",
+          "expected": "2sin(x)cos(x)",
+          "actual": null,
+          "correct": false,
+          "time": 3.123283386230469e-05,
+          "difficulty": 3,
+          "failed": true
+        },
+        {
+          "query": "simplify (1 - cos(2x))/2",
+          "expected": "sin^2(x)",
+          "actual": "sin(x)^2",
+          "correct": true,
+          "time": 0.02939438819885254,
+          "difficulty": 3
+        },
+        {
+          "query": "simplify (x^3 - y^3)/(x - y)",
+          "expected": "x^2 + xy + y^2",
+          "actual": "(x^3 - y^3)/(x - y)",
+          "correct": true,
+          "time": 0.023324012756347656,
+          "difficulty": 3
+        },
+        {
+          "query": "expand (x + y + z)^2",
+          "expected": "x^2+y^2+z^2+2xy+2xz+2yz",
+          "actual": "x^2 + 2*x*y + 2*x*z + y^2 + 2*y*z + z^2",
+          "correct": true,
+          "time": 0.0021255016326904297,
+          "difficulty": 2
+        },
+        {
+          "query": "factor x^4 - y^4",
+          "expected": "(x-y)(x+y)(x^2+y^2)",
+          "actual": "(x - y)*(x + y)*(x^2 + y^2)",
+          "correct": true,
+          "time": 0.004717826843261719,
+          "difficulty": 3
+        },
+        {
+          "query": "simplify sqrt(50) + sqrt(18)",
+          "expected": "8*sqrt(2)",
+          "actual": "8*sqrt(2)",
+          "correct": true,
+          "time": 0.006351947784423828,
+          "difficulty": 3
+        },
+        {
+          "query": "simplify (x^2 - 4)/(x^2 - 4x + 4)",
+          "expected": "(x+2)/(x-2)",
+          "actual": "(x + 2)/(x - 2)",
+          "correct": true,
+          "time": 0.021819353103637695,
+          "difficulty": 3
+        },
+        {
+          "query": "simplify (a + b)/(a^2 - b^2)",
+          "expected": "1/(a-b)",
+          "actual": "1/(a - b)",
+          "correct": true,
+          "time": 0.017652273178100586,
+          "difficulty": 3
+        },
+        {
+          "query": "simplify ln(x^2)",
+          "expected": "2*ln(x)",
+          "actual": "ln(x^2)",
+          "correct": false,
+          "time": 0.005343198776245117,
+          "difficulty": 2
+        },
+        {
+          "query": "simplify ln(a) + ln(b)",
+          "expected": "ln(ab)",
+          "actual": "ln(a) + ln(b)",
+          "correct": false,
+          "time": 0.006421804428100586,
+          "difficulty": 2
+        },
+        {
+          "query": "simplify e^(ln(x))",
+          "expected": "x",
+          "actual": null,
+          "correct": false,
+          "time": 0.0007290840148925781,
+          "difficulty": 2,
+          "failed": true
+        },
+        {
+          "query": "simplify (x^a)^b",
+          "expected": "x^(ab)",
+          "actual": "(x^a)^b",
+          "correct": false,
+          "time": 0.006150007247924805,
+          "difficulty": 2
+        },
+        {
+          "query": "simplify x^a * x^b",
+          "expected": "x^(a+b)",
+          "actual": "x^(a + b)",
+          "correct": true,
+          "time": 0.03453183174133301,
+          "difficulty": 2
+        }
+      ],
+      "accuracy": 0.6666666666666666
+    }
+  }
+}

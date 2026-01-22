@@ -1,0 +1,111 @@
+{
+  "total_tested": 130,
+  "tutoring_mode_rate": 0.9923076923076923,
+  "intent_distribution": {
+    "tutoring": 100,
+    "quick_answer": 1,
+    "explanation": 29
+  },
+  "by_difficulty": {
+    "1": {
+      "total": 1,
+      "tutoring_enabled": 1
+    },
+    "2": {
+      "total": 12,
+      "tutoring_enabled": 11
+    },
+    "3": {
+      "total": 41,
+      "tutoring_enabled": 41
+    },
+    "4": {
+      "total": 38,
+      "tutoring_enabled": 38
+    },
+    "5": {
+      "total": 23,
+      "tutoring_enabled": 23
+    },
+    "6": {
+      "total": 9,
+      "tutoring_enabled": 9
+    },
+    "7": {
+      "total": 5,
+      "tutoring_enabled": 5
+    },
+    "8": {
+      "total": 1,
+      "tutoring_enabled": 1
+    }
+  },
+  "by_source": {
+    "Hand-curated": {
+      "total": 78,
+      "tutoring_enabled": 77
+    },
+    "Paul's Online Notes": {
+      "total": 52,
+      "tutoring_enabled": 52
+    }
+  },
+  "by_category": {
+    "basic_power_rule": {
+      "total": 6,
+      "tutoring_enabled": 5
+    },
+    "basic_trig_exponential": {
+      "total": 8,
+      "tutoring_enabled": 8
+    },
+    "u_substitution_basic": {
+      "total": 10,
+      "tutoring_enabled": 10
+    },
+    "u_substitution_harder": {
+      "total": 6,
+      "tutoring_enabled": 6
+    },
+    "trig_integrals": {
+      "total": 15,
+      "tutoring_enabled": 15
+    },
+    "integration_by_parts": {
+      "total": 8,
+      "tutoring_enabled": 8
+    },
+    "partial_fractions_intro": {
+      "total": 5,
+      "tutoring_enabled": 5
+    },
+    "definite_integrals": {
+      "total": 9,
+      "tutoring_enabled": 9
+    },
+    "area_applications": {
+      "total": 3,
+      "tutoring_enabled": 3
+    },
+    "challenging_calc1": {
+      "total": 7,
+      "tutoring_enabled": 7
+    },
+    "word_problems": {
+      "total": 3,
+      "tutoring_enabled": 3
+    },
+    "conceptual_questions": {
+      "total": 3,
+      "tutoring_enabled": 3
+    },
+    "common_student_errors": {
+      "total": 5,
+      "tutoring_enabled": 5
+    },
+    "general_integration": {
+      "total": 42,
+      "tutoring_enabled": 42
+    }
+  }
+}

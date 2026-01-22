@@ -60,7 +60,9 @@ class SymPyHandler:
             'solve', 'derivative', 'integrate', 'differentiate',
             'expand', 'factor', 'simplify', 'calculate',
             'd/dx', 'dy/dx', 'integral', 'find the derivative',
-            'what is', 'compute', 'evaluate'
+            'what is', 'compute', 'evaluate',
+            # Bug B fix: Add combinatorics and number theory keywords
+            'gcd', 'lcm', 'mod', 'choose', 'factorial'
         ]
 
         # Keywords that indicate need for LLM
@@ -131,9 +133,30 @@ class SymPyHandler:
             SymPy expression or None if parsing fails
         """
         try:
+            import re
+
             # Replace common patterns
             expr_str = expr_str.replace('^', '**')  # x^2 -> x**2
             expr_str = expr_str.replace('÷', '/')
+
+            # FIX: Convert ln to log (SymPy uses log for natural log)
+            expr_str = expr_str.replace('ln(', 'log(')
+
+            # FIX: Handle 'e' as Euler's number (prevent it being treated as variable)
+            # Replace standalone 'e' with 'E' (SymPy's constant)
+            expr_str = re.sub(r'\be\b', 'E', expr_str)
+
+            # FIX BUG A: Convert inverse trig functions (arcsin → asin, etc.)
+            expr_str = expr_str.replace('arcsin', 'asin')
+            expr_str = expr_str.replace('arccos', 'acos')
+            expr_str = expr_str.replace('arctan', 'atan')
+            expr_str = expr_str.replace('arcsec', 'asec')
+            expr_str = expr_str.replace('arccsc', 'acsc')
+            expr_str = expr_str.replace('arccot', 'acot')
+
+            # FIX BUG F: Convert trig power notation sin^2(x) → (sin(x))**2
+            expr_str = re.sub(r'(sin|cos|tan|sec|csc|cot)\*\*(\d+)\(([^)]+)\)',
+                             r'(\1(\3))**\2', expr_str)
 
             # Parse the expression
             expr = parse_expr(expr_str, transformations=self.transformations)
@@ -206,12 +229,60 @@ class SymPyHandler:
             print(f"Error solving equation: {e}")
             return None
 
+    def _normalize_output(self, output: str) -> str:
+        """
+        Normalize output notation to match expected mathematical conventions.
+
+        - Convert log() to ln() (Bug C)
+        - Convert I to i for imaginary unit (Bug D)
+        - Convert exp() to e^ for clarity
+        - Convert ** to ^ for readability
+        - Add strategic multiplication signs
+        """
+        import re
+
+        # Bug C: Convert log to ln (natural logarithm)
+        output = output.replace('log(', 'ln(')
+
+        # Bug D: Convert imaginary unit I to i
+        output = output.replace('*I', 'i')
+        output = output.replace(' I', ' i')
+        output = output.replace('I,', 'i,')
+        output = output.replace('I)', 'i)')
+        if output.endswith(' I'):
+            output = output[:-2] + ' i'
+
+        # Convert exp(...) to e^(...)
+        # Handle nested exp calls carefully
+        output = re.sub(r'exp\(([^()]+)\)', r'e^(\1)', output)
+        # Handle more complex nested expressions
+        max_iterations = 5
+        for _ in range(max_iterations):
+            old_output = output
+            output = re.sub(r'exp\(([^()]*\([^()]*\)[^()]*)\)', r'e^(\1)', output)
+            if output == old_output:
+                break
+
+        # Convert ** to ^ for readability
+        output = output.replace('**', '^')
+
+        # Add strategic multiplication signs:
+        # Before opening parens: 3(x+1) → 3*(x+1)
+        output = re.sub(r'(\d)(\()', r'\1*\2', output)
+        # Between closing and opening parens: (x+1)(x-1) → (x+1)*(x-1)
+        output = re.sub(r'(\))(\()', r'\1*\2', output)
+
+        return output
+
     def _format_solutions(self, variable: sp.Symbol, solutions: List) -> str:
         """Format solutions into readable string."""
         if len(solutions) == 1:
-            return f"{variable} = {solutions[0]}"
+            formatted = f"{variable} = {solutions[0]}"
         else:
-            return ", ".join([f"{variable} = {sol}" for sol in solutions])
+            formatted = ", ".join([f"{variable} = {sol}" for sol in solutions])
+
+        # Apply output normalization
+        return self._normalize_output(formatted)
 
     def _solve_system(self, query: str) -> Optional[Dict[str, Any]]:
         """
@@ -282,16 +353,66 @@ class SymPyHandler:
             Dictionary with derivative or None if computation fails
         """
         try:
-            # Extract expression
-            equation_str = self._extract_equation(query)
+            # STEP 1: Extract the mathematical expression from natural language
+            equation_str = None
+
+            # Handle d/dx(expression) notation
+            # Match everything between first ( and last )
+            match = re.search(r'd/d([xyz])\s*\((.+)\)', query, re.IGNORECASE)
+            if match:
+                # Extract content between parentheses
+                full_match = match.group(0)  # e.g., "d/dx(sin(x))"
+                # Find the opening paren after d/dx
+                start = full_match.index('(')
+                # Get everything from that paren to end, then strip last char
+                equation_str = full_match[start+1:-1].strip()
+
+            # Handle "find d/dx of expression" pattern (MUST come before generic d/dx pattern)
             if not equation_str:
-                # Try to extract after "of:"
-                match = re.search(r'of:?\s*(.+)', query, re.IGNORECASE)
+                match = re.search(r'find\s+d/d[xyz]\s+of\s+(.+)', query, re.IGNORECASE)
                 if match:
                     equation_str = match.group(1).strip()
 
+            # Handle "derivative of expression" pattern
+            if not equation_str:
+                match = re.search(r'derivative\s+of\s+(.+?)(?:\s+with\s+respect\s+to|\?|$)', query, re.IGNORECASE)
+                if match:
+                    equation_str = match.group(1).strip()
+
+            # Handle "differentiate expression" pattern
+            if not equation_str:
+                match = re.search(r'differentiate\s+(.+?)(?:\s+with\s+respect\s+to|\?|$)', query, re.IGNORECASE)
+                if match:
+                    equation_str = match.group(1).strip()
+
+            # Handle "what is the derivative of expression" pattern
+            if not equation_str:
+                match = re.search(r'what\s+is\s+(?:the\s+)?derivative\s+of\s+(.+?)(?:\?|$)', query, re.IGNORECASE)
+                if match:
+                    equation_str = match.group(1).strip()
+
+            # Handle "what is d/dx of expression" pattern (MUST come before generic d/dx)
+            if not equation_str:
+                match = re.search(r'what\s+is\s+d/d[xyz]\s+of\s+(.+?)(?:\?|$)', query, re.IGNORECASE)
+                if match:
+                    equation_str = match.group(1).strip()
+
+            # Generic d/dx pattern (fallback, comes LAST to avoid false matches)
+            if not equation_str:
+                match = re.search(r'd/d([xyz])\s+(.+)', query, re.IGNORECASE)
+                if match:
+                    equation_str = match.group(2).strip()
+
+            # Fallback: try extract_equation
+            if not equation_str:
+                equation_str = self._extract_equation(query)
+
             if not equation_str:
                 return None
+
+            # STEP 2: Clean up the expression string
+            # Remove trailing question marks and whitespace
+            equation_str = equation_str.rstrip('?').strip()
 
             # Parse expression
             expr = self._parse_expression(equation_str)
@@ -308,8 +429,9 @@ class SymPyHandler:
             # Compute derivative
             derivative = sp.diff(expr, var)
 
-            # Format derivative in cleaner format (replace ** with ^)
-            formatted_derivative = str(derivative).replace('**', '^').replace('*', '')
+            # Convert to string and apply comprehensive normalization
+            formatted_derivative = str(derivative)
+            formatted_derivative = self._normalize_output(formatted_derivative)
 
             return {
                 'success': True,
@@ -333,18 +455,51 @@ class SymPyHandler:
             Dictionary with integral or None if computation fails
         """
         try:
-            # Extract expression (remove 'dx', 'dy', etc.)
-            equation_str = self._extract_equation(query)
+            # STEP 1: Extract the mathematical expression from natural language
+            equation_str = None
+
+            # Handle "integral of expression" pattern
+            match = re.search(r'integral\s+of\s+(.+?)(?:\s+d[xyz]|\s+from|\?|$)', query, re.IGNORECASE)
+            if match:
+                equation_str = match.group(1).strip()
+
+            # Handle "integrate expression" pattern
             if not equation_str:
-                match = re.search(r'of:?\s*(.+)', query, re.IGNORECASE)
+                match = re.search(r'integrate\s+(.+?)(?:\s+d[xyz]|\s+from|\?|$)', query, re.IGNORECASE)
                 if match:
                     equation_str = match.group(1).strip()
+
+            # Handle "find integral of expression" pattern
+            if not equation_str:
+                match = re.search(r'find\s+(?:the\s+)?integral\s+of\s+(.+?)(?:\s+d[xyz]|\s+from|\?|$)', query, re.IGNORECASE)
+                if match:
+                    equation_str = match.group(1).strip()
+
+            # Handle "find the integral of expression" pattern
+            if not equation_str:
+                match = re.search(r'find\s+integral\s+of\s+(.+?)(?:\s+d[xyz]|\?|$)', query, re.IGNORECASE)
+                if match:
+                    equation_str = match.group(1).strip()
+
+            # Handle definite integral patterns (for later enhancement)
+            if not equation_str:
+                match = re.search(r'integral\s+from\s+.+?\s+to\s+.+?\s+of\s+(.+)', query, re.IGNORECASE)
+                if match:
+                    equation_str = match.group(1).strip()
+
+            # Fallback: try extract_equation
+            if not equation_str:
+                equation_str = self._extract_equation(query)
 
             if not equation_str:
                 return None
 
-            # Remove differential notation (dx, dy, etc.)
-            equation_str = re.sub(r'd[a-z]$', '', equation_str).strip()
+            # STEP 2: Clean up the expression string
+            # Remove trailing question marks and whitespace
+            equation_str = equation_str.rstrip('?').strip()
+
+            # Remove differential notation at end (dx, dy, dz)
+            equation_str = re.sub(r'\s*d[xyz]\s*$', '', equation_str).strip()
 
             # Parse expression
             expr = self._parse_expression(equation_str)
@@ -361,11 +516,15 @@ class SymPyHandler:
             # Compute integral
             integral = sp.integrate(expr, var)
 
+            # Convert to string and apply comprehensive normalization
+            formatted_integral = str(integral)
+            formatted_integral = self._normalize_output(formatted_integral)
+
             return {
                 'success': True,
                 'integral': integral,
                 'variable': str(var),
-                'formatted': f"∫ {expr} d{var} = {integral} + C"
+                'formatted': f"{formatted_integral} + C"
             }
 
         except Exception as e:
@@ -398,7 +557,7 @@ class SymPyHandler:
             if expr is None:
                 return None
 
-            # Apply appropriate operation
+            # Apply appropriate operation with aggressive simplification
             if is_expand:
                 result = sp.expand(expr)
                 operation = 'expansion'
@@ -406,14 +565,19 @@ class SymPyHandler:
                 result = sp.factor(expr)
                 operation = 'factorization'
             else:
-                result = sp.simplify(expr)
+                # Use aggressive simplification for better results
+                result = sp.simplify(expr, force=True)
                 operation = 'simplification'
+
+            # Convert to string and apply comprehensive normalization
+            formatted = str(result)
+            formatted = self._normalize_output(formatted)
 
             return {
                 'success': True,
                 'result': result,
                 'operation': operation,
-                'formatted': str(result)
+                'formatted': formatted
             }
 
         except Exception as e:
@@ -460,10 +624,13 @@ class SymPyHandler:
                 except:
                     pass
 
+            # Normalize output
+            formatted = self._normalize_output(str(result))
+
             return {
                 'success': True,
                 'result': result,
-                'formatted': str(result)
+                'formatted': formatted
             }
 
         except Exception as e:
@@ -483,6 +650,9 @@ class SymPyHandler:
         if not self.can_handle(query):
             return None
 
+        # FIX BUG B: Preprocess natural language math operators
+        query = self._preprocess_natural_language_operators(query)
+
         query_lower = query.lower()
 
         # Route to appropriate handler
@@ -496,13 +666,52 @@ class SymPyHandler:
             return self.solve_equation(query)
         elif ' and ' in query_lower and '=' in query:
             return self.solve_equation(query)  # System of equations
-        elif 'what is' in query_lower:
+        elif 'what is' in query_lower or 'calculate' in query_lower or 'compute' in query_lower:
             return self.evaluate_expression(query)
-        elif 'calculate' in query_lower or 'compute' in query_lower:
-            return self.solve_equation(query)
         else:
             # Try to handle as equation by default
             return self.solve_equation(query)
+
+    def _preprocess_natural_language_operators(self, query: str) -> str:
+        """
+        FIX BUG B: Convert natural language math operators to SymPy functions.
+
+        Handles: choose, mod, gcd, lcm, factorial, etc.
+        """
+        import re
+
+        # Binomial coefficients: "n choose k"
+        match = re.search(r'(\d+)\s+choose\s+(\d+)', query, re.IGNORECASE)
+        if match:
+            n, k = match.groups()
+            query = re.sub(r'\d+\s+choose\s+\d+', f'binomial({n}, {k})', query, flags=re.IGNORECASE)
+
+        # GCD: "gcd of a and b"
+        match = re.search(r'gcd\s+of\s+(\d+)\s+and\s+(\d+)', query, re.IGNORECASE)
+        if match:
+            a, b = match.groups()
+            # Replace the whole query with just the function call for evaluation
+            return f'what is gcd({a}, {b})'
+
+        # LCM: "lcm of a, b, and c"
+        match = re.search(r'lcm\s+of\s+([\d,\s]+)', query, re.IGNORECASE)
+        if match:
+            numbers = re.findall(r'\d+', match.group(1))
+            return f'what is lcm({", ".join(numbers)})'
+
+        # Modular arithmetic: "a mod b"
+        match = re.search(r'(\d+)\s+mod\s+(\d+)', query, re.IGNORECASE)
+        if match:
+            a, b = match.groups()
+            query = re.sub(r'\d+\s+mod\s+\d+', f'Mod({a}, {b})', query, flags=re.IGNORECASE)
+
+        # Prime factors: "prime factors of n"
+        match = re.search(r'prime\s+factors?\s+of\s+(\d+)', query, re.IGNORECASE)
+        if match:
+            n = match.group(1)
+            query = re.sub(r'prime\s+factors?\s+of\s+\d+', f'factorint({n})', query, flags=re.IGNORECASE)
+
+        return query
 
 
 # Test harness

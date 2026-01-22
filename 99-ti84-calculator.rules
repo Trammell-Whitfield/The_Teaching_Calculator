@@ -1,0 +1,9 @@
+# Holy Calculator - TI-84 Plus Silver USB Auto-Launch Rules
+# File: /etc/udev/rules.d/99-ti84-calculator.rules
+# Device: TI-84 Plus Silver (VID: 0451, PID: e008)
+
+# Launch Holy Calculator when TI-84 Plus Silver is connected
+ACTION=="add", SUBSYSTEM=="usb", ATTRS{idVendor}=="0451", ATTRS{idProduct}=="e008", TAG+="systemd", ENV{SYSTEMD_WANTS}="holy-calculator.service", RUN+="/usr/bin/logger 'TI-84 Plus Silver connected - starting Holy Calculator'"
+
+# Stop service when TI-84 is disconnected
+ACTION=="remove", SUBSYSTEM=="usb", ENV{ID_VENDOR_ID}=="0451", ENV{ID_MODEL_ID}=="e008", RUN+="/bin/systemctl stop holy-calculator.service", RUN+="/usr/bin/logger 'TI-84 Plus Silver disconnected - stopping Holy Calculator'"

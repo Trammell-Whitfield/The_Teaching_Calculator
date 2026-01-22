@@ -108,7 +108,7 @@ class PlatformConfig:
             # Inference parameters (optimized for math queries)
             'n_threads': 4,  # Increased from 2 - safe with good cooling (<70°C)
             'n_ctx': context_window,
-            'n_predict': 256,  # Reduced from 512 - math answers are usually concise
+            'n_predict': 256,  # Increased for full explanations (calculus, word problems)
             'temperature': 0.3,  # Increased from 0.1 - prevents reasoning loops
 
             # Memory management

@@ -1,0 +1,35 @@
+{
+  "total_problems": 130,
+  "by_source": {
+    "Hand-curated": 78,
+    "Paul's Online Notes": 52
+  },
+  "by_difficulty": {
+    "1": 1,
+    "2": 12,
+    "3": 41,
+    "4": 38,
+    "5": 23,
+    "6": 9,
+    "7": 5,
+    "8": 1
+  },
+  "by_category": {
+    "basic_power_rule": 6,
+    "basic_trig_exponential": 8,
+    "u_substitution_basic": 10,
+    "u_substitution_harder": 6,
+    "trig_integrals": 15,
+    "integration_by_parts": 8,
+    "partial_fractions_intro": 5,
+    "definite_integrals": 9,
+    "area_applications": 3,
+    "challenging_calc1": 7,
+    "word_problems": 3,
+    "conceptual_questions": 3,
+    "common_student_errors": 5,
+    "general_integration": 42
+  },
+  "with_answers": 78,
+  "with_solutions": 0
+}

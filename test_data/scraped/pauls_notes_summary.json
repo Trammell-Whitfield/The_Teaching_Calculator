@@ -1,0 +1,16 @@
+{
+  "total_problems": 52,
+  "by_section": {
+    "indefinite_integrals": 7,
+    "definite_integrals": 18,
+    "substitution_indefinite": 17,
+    "substitution_definite": 10
+  },
+  "by_difficulty": {
+    "3": 23,
+    "4": 21,
+    "5": 8
+  },
+  "with_solutions": 0,
+  "with_answers": 0
+}

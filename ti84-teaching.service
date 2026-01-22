@@ -1,0 +1,19 @@
+[Unit]
+Description=TI-84 Teaching Interface with Auto-Detection
+After=network.target
+
+[Service]
+Type=simple
+User=tram
+WorkingDirectory=/home/tram/Holy-calc-pi
+ExecStart=/usr/bin/python3 /home/tram/Holy-calc-pi/start_teaching_interface.py --stats
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Environment variables (if needed)
+# Environment="PYTHONUNBUFFERED=1"
+
+[Install]
+WantedBy=multi-user.target

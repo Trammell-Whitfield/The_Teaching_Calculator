@@ -118,20 +118,41 @@ class LLMHandler:
 
     def _build_prompt(self, query: str) -> str:
         """
-        Build the prompt for the LLM with proper formatting.
+        Build Chain-of-Thought prompt for the LLM.
 
-        DeepSeek-Math expects a structured prompt for best results.
+        Uses structured reasoning to improve accuracy and show work.
+        Qwen2.5-Math responds well to explicit step-by-step instructions.
 
         Args:
             query: User's mathematical query
 
         Returns:
-            Formatted prompt string
+            Formatted Chain-of-Thought prompt string
         """
-        # DeepSeek-Math instruction format
-        prompt = f"""You are a mathematical problem solver. Solve the following problem step by step.
+        # Chain-of-Thought prompt format optimized for Qwen2.5-Math
+        prompt = f"""You are a mathematical expert. Solve this problem using clear step-by-step reasoning.
 
 Problem: {query}
+
+Solve this problem systematically:
+
+Step 1 - Understand the Problem:
+- What is being asked?
+- What information is given?
+- What mathematical concepts apply?
+
+Step 2 - Plan the Solution:
+- What formulas or theorems are needed?
+- What is the logical sequence of steps?
+
+Step 3 - Execute the Solution:
+[Show all calculations clearly]
+
+Step 4 - Verify the Answer:
+- Does the result make sense?
+- Can I check it a different way?
+
+IMPORTANT: End your response with "The answer is:" followed by ONLY the final numerical or algebraic answer.
 
 Solution:"""
 
@@ -169,15 +190,17 @@ Solution:"""
             '--repeat-penalty', str(params['repeat_penalty']),
             '-t', str(params['threads']),
             '--log-disable',  # Disable llama.cpp logging for cleaner output
+            '-st',  # Single-turn mode - exit after one response
         ]
 
         try:
-            # Run llama.cpp
+            # Run llama.cpp with stdin closed to prevent interactive mode
             result = subprocess.run(
                 cmd,
+                stdin=subprocess.DEVNULL,  # Close stdin - prevents waiting for input
                 capture_output=True,
                 text=True,
-                timeout=120  # 2 minute timeout
+                timeout=300  # 5 minute timeout (Raspberry Pi needs more time)
             )
 
             if result.returncode != 0:
@@ -187,15 +210,23 @@ Solution:"""
                     'source': 'llm'
                 }
 
-            # Extract the response (llama.cpp outputs the prompt + completion)
-            full_output = result.stdout
+            # Extract the response (llama.cpp outputs to both stdout and stderr)
+            full_output = result.stdout + "\n" + result.stderr
 
             # Debug: Print raw output to help diagnose extraction issues
             if os.environ.get('DEBUG_LLM'):
                 print(f"\n{'='*70}")
-                print("RAW LLM OUTPUT:")
+                print("RAW LLM STDOUT:")
                 print(f"{'='*70}")
-                print(full_output)
+                print(result.stdout)
+                print(f"\n{'='*70}")
+                print("RAW LLM STDERR:")
+                print(f"{'='*70}")
+                print(result.stderr[:2000])  # Limit stderr output
+                print(f"\n{'='*70}")
+                print("COMBINED OUTPUT:")
+                print(f"{'='*70}")
+                print(full_output[:2000])
                 print(f"{'='*70}\n")
 
             # Extract answer using multiple patterns
@@ -224,7 +255,7 @@ Solution:"""
         except subprocess.TimeoutExpired:
             return {
                 'success': False,
-                'error': 'LLM inference timed out (>120s)',
+                'error': 'LLM inference timed out (>300s)',
                 'source': 'llm'
             }
         except Exception as e:
@@ -254,10 +285,14 @@ Solution:"""
         """
         # List of patterns to try, in order of preference
         patterns = [
-            # Explicit answer markers
-            r"(?:The answer is|Answer:|Final answer:)\s*\**\s*([^\n]+)",
-            r"####\s*([^\n]+)",  # GSM8K format
-            r"\\boxed\{([^}]+)\}",  # LaTeX boxed format
+            # LaTeX boxed format (highest priority for math LLMs)
+            r"\\boxed\{([^}]+)\}",
+
+            # GSM8K format
+            r"####\s*([^\n]+)",
+
+            # Explicit answer markers (multi-line aware)
+            r"(?:The answer is|Answer:|Final answer:)\s*[:]*\s*\$?\\?\[?\s*([^\\$\n]+)",
 
             # Common conclusion phrases
             r"Therefore,?\s+([^\n.]+)[.\n]",
